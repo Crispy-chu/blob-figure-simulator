@@ -800,6 +800,54 @@
       padding: 7px 9px;
       outline: none;
     }
+    .figure-combo {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr 58px;
+      gap: 6px;
+    }
+    .figure-combo button {
+      min-height: 38px;
+      border: 2px solid #0a1119;
+      border-radius: 8px;
+      background: linear-gradient(180deg, #9aa7b5, #4b596a);
+      color: #fff;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: inset 0 2px 0 rgba(255,255,255,.18), 0 2px 0 rgba(0,0,0,.35);
+    }
+    .figure-options {
+      grid-column: 1 / -1;
+      max-height: 190px;
+      overflow: auto;
+      border: 2px solid #0a1119;
+      border-radius: 8px;
+      background: #eef2f6;
+      padding: 4px;
+      display: grid;
+      gap: 3px;
+    }
+    .figure-options[hidden] { display: none; }
+    .figure-option {
+      min-height: 31px;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: #15191f;
+      text-align: left;
+      padding: 6px 8px;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 850;
+      cursor: pointer;
+    }
+    .figure-option:hover,
+    .figure-option:focus {
+      background: #cfe7f5;
+      outline: none;
+    }
     .modal-actions {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -900,8 +948,11 @@
       <h3>빈 슬롯 세팅</h3>
       <div class="modal-grid">
         <label class="modal-field">피규어
-          <input id="slotFigureInput" type="text" list="slotFigureOptions" autocomplete="off" />
-          <datalist id="slotFigureOptions"></datalist>
+          <div class="figure-combo">
+            <input id="slotFigureInput" type="text" autocomplete="off" placeholder="피규어 이름 입력" />
+            <button type="button" id="figureListToggle">선택</button>
+            <div class="figure-options" id="slotFigureOptions" hidden></div>
+          </div>
         </label>
         <label class="modal-field">등급
           <select id="slotGradeSelect"></select>
@@ -1099,8 +1150,8 @@
     }
 
     function initSetupControls() {
-      $("slotFigureOptions").innerHTML = figures.map(fig => `<option value="${escapeHtml(fig.name)}"></option>`).join("");
       $("slotGradeSelect").innerHTML = grades.map(grade => `<option value="${grade}">${grade}</option>`).join("");
+      renderFigureOptions("");
     }
 
     function findFigureByInput(value) {
@@ -1112,12 +1163,45 @@
         || figures[0];
     }
 
+    function matchingFigures(value) {
+      const query = String(value || "").trim().toLowerCase();
+      if (!query) return figures;
+      return figures.filter(fig => fig.name.toLowerCase().includes(query));
+    }
+
+    function renderFigureOptions(filterValue) {
+      const matches = matchingFigures(filterValue);
+      $("slotFigureOptions").innerHTML = matches.length
+        ? matches.map(fig => `<button type="button" class="figure-option" data-name="${escapeHtml(fig.name)}">${escapeHtml(fig.name)}</button>`).join("")
+        : `<button type="button" class="figure-option" data-name="${escapeHtml(figures[0].name)}">검색 결과 없음</button>`;
+    }
+
+    function showFigureOptions() {
+      renderFigureOptions($("slotFigureInput").value);
+      $("slotFigureOptions").hidden = false;
+    }
+
+    function hideFigureOptions() {
+      $("slotFigureOptions").hidden = true;
+    }
+
+    function toggleFigureOptions() {
+      if ($("slotFigureOptions").hidden) showFigureOptions();
+      else hideFigureOptions();
+    }
+
+    function openAllFigureOptions() {
+      renderFigureOptions("");
+      $("slotFigureOptions").hidden = false;
+    }
+
     function openSlotSetup(index) {
       editingSlotIndex = index;
       const slot = slots[index];
-      $("slotFigureInput").value = slot && !slot.empty ? slot.figure.name : figures[0].name;
+      $("slotFigureInput").value = slot && !slot.empty ? slot.figure.name : "";
       $("slotGradeSelect").value = slot && !slot.empty ? slot.grade : "일반";
       $("slotPercentInput").value = slot && !slot.empty ? slot.percent : 100;
+      hideFigureOptions();
       $("slotModal").hidden = false;
       $("slotFigureInput").focus();
       $("slotFigureInput").select();
@@ -1125,6 +1209,7 @@
 
     function closeSlotSetup() {
       $("slotModal").hidden = true;
+      hideFigureOptions();
       editingSlotIndex = null;
     }
 
@@ -1133,6 +1218,7 @@
       const fig = findFigureByInput($("slotFigureInput").value);
       const grade = grades.includes($("slotGradeSelect").value) ? $("slotGradeSelect").value : "일반";
       const percent = clampInt($("slotPercentInput").value, 1, 100);
+      $("slotFigureInput").value = fig.name;
       slots[editingSlotIndex] = { figure: fig, grade, percent, locked: false, manual: true };
       addLog(`${fig.name} ${grade}(${percent}%) 슬롯 세팅`);
       closeSlotSetup();
@@ -1367,6 +1453,18 @@
     $("keyApplyBtn").addEventListener("click", applyKeySetup);
     $("gaugeCancelBtn").addEventListener("click", closeGaugeSetup);
     $("gaugeApplyBtn").addEventListener("click", applyGaugeSetup);
+    $("figureListToggle").addEventListener("click", openAllFigureOptions);
+    $("slotFigureInput").addEventListener("focus", showFigureOptions);
+    $("slotFigureInput").addEventListener("input", () => showFigureOptions());
+    $("slotFigureOptions").addEventListener("click", (event) => {
+      const option = event.target.closest(".figure-option");
+      if (!option) return;
+      const name = option.dataset.name;
+      if (!figures.some(fig => fig.name === name)) return;
+      $("slotFigureInput").value = name;
+      hideFigureOptions();
+      $("slotGradeSelect").focus();
+    });
     $("slotModal").addEventListener("click", (event) => { if (event.target === $("slotModal")) closeSlotSetup(); });
     $("keyModal").addEventListener("click", (event) => { if (event.target === $("keyModal")) closeKeySetup(); });
     $("gaugeModal").addEventListener("click", (event) => { if (event.target === $("gaugeModal")) closeGaugeSetup(); });
