@@ -61,6 +61,29 @@
         linear-gradient(135deg, #1b2b3f 0%, #111827 100%);
       box-shadow: 0 16px 50px rgba(0,0,0,.38);
     }
+    .tier-open-btn {
+      position: absolute;
+      left: 8px;
+      top: 8px;
+      z-index: 8;
+      min-height: 28px;
+      padding: 0 8px;
+      border: 2px solid rgba(7, 13, 20, .9);
+      border-radius: 8px;
+      background: linear-gradient(180deg, #fff36b, #f4bd18);
+      color: #2e2403;
+      font: inherit;
+      font-size: 11px;
+      font-weight: 1000;
+      cursor: pointer;
+      box-shadow: inset 0 2px 0 rgba(255,255,255,.58), 0 3px 0 rgba(0,0,0,.45);
+      text-shadow: 0 1px 0 rgba(255,255,255,.45);
+      white-space: nowrap;
+    }
+    .tier-open-btn:active {
+      transform: translateY(2px);
+      box-shadow: inset 0 2px 0 rgba(255,255,255,.5), 0 1px 0 rgba(0,0,0,.45);
+    }
     .spotlight {
       position: absolute;
       width: 130px;
@@ -198,6 +221,7 @@
     .results { display: flex; flex-direction: column; gap: 8px; }
     .card {
       position: relative;
+      overflow: hidden;
       min-height: 72px;
       border-radius: 11px;
       border: 3px solid rgba(0,0,0,.33);
@@ -208,6 +232,10 @@
       padding: 8px;
       color: #252220;
       box-shadow: inset 0 3px 0 rgba(255,255,255,.35), 0 2px 0 rgba(0,0,0,.36);
+    }
+    .card > * {
+      position: relative;
+      z-index: 1;
     }
     .card.normal { background: linear-gradient(180deg, #E7E5E1, var(--normal)); }
     .card.rare { background: linear-gradient(180deg, #BDE8FA, var(--rare)); }
@@ -642,11 +670,11 @@
     }
     .lock-btn {
       position: absolute;
-      right: -7px;
+      right: 4px;
       top: 50%;
       transform: translateY(-50%);
-      width: 32px;
-      height: 34px;
+      width: 29px;
+      height: 31px;
       padding: 0;
       border-radius: 9px;
       border: 3px solid #4c5360;
@@ -712,20 +740,27 @@
     }
     .pity-box {
       height: 43px;
-      padding: 5px 5px 4px;
+      padding: 4px 4px 3px;
       border-radius: 7px;
       border: 2px solid #4b3421;
       background: linear-gradient(180deg, #2d211a, #151514);
       color: #ffad22;
-      font-size: 10px;
-      line-height: 1.05;
+      font-size: 9px;
+      line-height: 1.12;
       box-shadow: inset 0 2px 0 rgba(255,255,255,.1), 0 3px 0 rgba(0,0,0,.55);
       cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      word-break: keep-all;
+      overflow: hidden;
     }
     .pity-count {
-      margin-top: 5px;
+      margin-top: 1px;
       color: #66eaff;
-      font-size: 12px;
+      font-size: 11px;
+      line-height: 1;
       text-shadow: 0 1px 0 #063544;
     }
     .stats {
@@ -778,9 +813,54 @@
     .machine.draw-glow::before {
       box-shadow: inset 0 4px 0 rgba(255,255,255,.32), 0 5px 0 rgba(0,0,0,.5), 0 0 24px rgba(145,229,255,.34);
     }
+    .card.draw-glow {
+      animation: cardSoftBloom .72s cubic-bezier(.16,.84,.28,1) both;
+    }
+    .card.draw-glow::after {
+      content: "";
+      position: absolute;
+      z-index: 0;
+      inset: -45% -25%;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 18% 50%, rgba(255,255,255,.86) 0 8%, rgba(255,255,255,.45) 16%, rgba(255,255,255,0) 36%),
+        linear-gradient(105deg, rgba(255,255,255,0) 20%, rgba(255,255,255,.58) 45%, rgba(255,255,255,.18) 58%, rgba(255,255,255,0) 74%);
+      transform: translateX(-48%) scale(.88);
+      opacity: 0;
+      animation: cardLightSpread .72s cubic-bezier(.16,.84,.28,1) both;
+      mix-blend-mode: screen;
+    }
+    .card.draw-glow .mini-icon {
+      animation: iconSoftBloom .72s cubic-bezier(.16,.84,.28,1) both;
+    }
+    .card.draw-glow .mini-icon img {
+      animation: iconImageLift .72s cubic-bezier(.16,.84,.28,1) both;
+    }
     @keyframes rollShake {
       from { transform: translateX(-50%) translateY(-1px) rotate(-1deg); }
       to { transform: translateX(-50%) translateY(2px) rotate(1deg); }
+    }
+    @keyframes cardSoftBloom {
+      0% { filter: saturate(1) brightness(1); box-shadow: inset 0 3px 0 rgba(255,255,255,.35), 0 2px 0 rgba(0,0,0,.36); }
+      30% { filter: saturate(1.18) brightness(1.16); box-shadow: inset 0 3px 0 rgba(255,255,255,.62), 0 0 16px rgba(255,255,255,.34), 0 3px 0 rgba(0,0,0,.32); }
+      62% { filter: saturate(1.1) brightness(1.09); box-shadow: inset 0 3px 0 rgba(255,255,255,.52), 0 0 11px rgba(255,255,255,.2), 0 2px 0 rgba(0,0,0,.34); }
+      100% { filter: saturate(1) brightness(1); box-shadow: inset 0 3px 0 rgba(255,255,255,.35), 0 2px 0 rgba(0,0,0,.36); }
+    }
+    @keyframes cardLightSpread {
+      0% { opacity: 0; transform: translateX(-54%) scale(.84); }
+      18% { opacity: .9; }
+      54% { opacity: .72; transform: translateX(3%) scale(1.08); }
+      100% { opacity: 0; transform: translateX(46%) scale(1.14); }
+    }
+    @keyframes iconSoftBloom {
+      0% { filter: saturate(1) brightness(1); box-shadow: inset 0 -4px 0 rgba(0,0,0,.08); }
+      28% { filter: saturate(1.18) brightness(1.2); box-shadow: inset 0 -4px 0 rgba(0,0,0,.05), 0 0 18px rgba(255,255,255,.5); }
+      100% { filter: saturate(1) brightness(1); box-shadow: inset 0 -4px 0 rgba(0,0,0,.08); }
+    }
+    @keyframes iconImageLift {
+      0% { transform: scale(1); }
+      32% { transform: scale(1.045); }
+      100% { transform: scale(1); }
     }
     .card.expect-card {
       grid-template-columns: 1fr 92px;
@@ -1032,6 +1112,160 @@
       line-height: 1.2;
       text-shadow: 0 2px 0 rgba(0,0,0,.55);
     }
+    .tier-panel {
+      width: min(392px, 100%);
+      max-height: calc(100vh - 34px);
+      overflow: auto;
+    }
+    .tier-head {
+      display: grid;
+      grid-template-columns: 1fr 30px;
+      align-items: start;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .tier-head h3 { margin: 0; }
+    .tier-close {
+      width: 30px;
+      height: 30px;
+      border: 2px solid #0b1219;
+      border-radius: 8px;
+      background: linear-gradient(180deg, #9aa7b5, #4b596a);
+      color: #fff;
+      font: inherit;
+      font-size: 20px;
+      font-weight: 1000;
+      line-height: 24px;
+      cursor: pointer;
+      box-shadow: inset 0 2px 0 rgba(255,255,255,.24), 0 2px 0 rgba(0,0,0,.38);
+    }
+    .tier-standard {
+      margin-bottom: 10px;
+      padding: 7px 9px;
+      border-radius: 7px;
+      background: rgba(0,0,0,.28);
+      color: #ffe45a;
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .tier-board {
+      display: grid;
+      gap: 7px;
+    }
+    .tier-row {
+      display: grid;
+      grid-template-columns: 54px 1fr;
+      gap: 7px;
+      align-items: stretch;
+      min-height: 58px;
+    }
+    .tier-label {
+      border: 2px solid rgba(0,0,0,.45);
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      padding: 4px;
+      color: #111820;
+      font-size: 12px;
+      font-weight: 1000;
+      text-align: center;
+      box-shadow: inset 0 2px 0 rgba(255,255,255,.36), 0 2px 0 rgba(0,0,0,.32);
+    }
+    .tier-label.t0 { background: linear-gradient(180deg, #fff36b, #f2a713); }
+    .tier-label.t1 { background: linear-gradient(180deg, #baf4ff, #40bfe0); }
+    .tier-label.t2 { background: linear-gradient(180deg, #e6d2ff, #a673e7); }
+    .tier-label.t3 { background: linear-gradient(180deg, #d8f0c1, #78c760); }
+    .tier-label.t4 { background: linear-gradient(180deg, #d8dde5, #929daa); }
+    .tier-label.bad { background: linear-gradient(180deg, #797f8a, #474f5d); color: #fff; }
+    .tier-figures {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      padding: 6px;
+      border: 2px solid rgba(0,0,0,.28);
+      border-radius: 8px;
+      background: rgba(255,255,255,.08);
+      min-width: 0;
+    }
+    .tier-figure {
+      width: 54px;
+      min-height: 66px;
+      border: 0;
+      border-radius: 8px;
+      background: rgba(0,0,0,.24);
+      color: #f8fbff;
+      font: inherit;
+      font-size: 9px;
+      font-weight: 900;
+      line-height: 1.1;
+      display: grid;
+      grid-template-rows: 42px auto;
+      gap: 3px;
+      justify-items: center;
+      align-items: center;
+      padding: 4px;
+      cursor: pointer;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.14);
+    }
+    .tier-figure[disabled] {
+      cursor: default;
+      opacity: .62;
+    }
+    .tier-figure.active {
+      outline: 2px solid #ffe45a;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 0 12px rgba(255,228,90,.5);
+    }
+    .tier-figure-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 9px;
+      background: linear-gradient(180deg, #FFC46E, var(--mythic));
+      border: 2px solid rgba(255,255,255,.72);
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+    }
+    .tier-figure-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+    .tier-detail-panel {
+      width: min(342px, 100%);
+    }
+    .tier-detail {
+      padding: 10px;
+      border: 2px solid rgba(0,0,0,.35);
+      border-radius: 8px;
+      background: linear-gradient(180deg, rgba(238,242,246,.96), rgba(202,211,220,.96));
+      color: #141b24;
+      font-size: 12px;
+      line-height: 1.45;
+      font-weight: 800;
+      box-shadow: inset 0 2px 0 rgba(255,255,255,.45);
+    }
+    .tier-detail-title {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 7px;
+      font-size: 14px;
+      font-weight: 1000;
+      color: #101820;
+    }
+    .tier-detail-title .tier-figure-icon {
+      width: 34px;
+      height: 34px;
+      flex: 0 0 auto;
+    }
+    .tier-detail-section {
+      margin-top: 7px;
+    }
+    .tier-detail-section b {
+      color: #00813a;
+    }
     .modal-grid {
       display: grid;
       gap: 9px;
@@ -1232,7 +1466,7 @@
     @media (max-width: 390px) {
       .app { width: 100%; }
       .results, .draw-area, .stats { margin-left: 27px; margin-right: 27px; }
-      .draw-area { grid-template-columns: 74px 1fr 93px; }
+      .draw-area { grid-template-columns: 70px 1fr 99px; }
       .main-draw { font-size: 20px; }
     }
   </style>
@@ -1256,6 +1490,7 @@
     </div>
 
     <section class="machine">
+      <button class="tier-open-btn" id="tierBtn" type="button">🏆 피규어 티어표</button>
       <div class="spotlight s1"></div><div class="spotlight s2"></div><div class="spotlight s3"></div><div class="spotlight s4"></div>
       <div class="stage"></div>
       <div class="slots" id="slotStage"></div>
@@ -1375,6 +1610,27 @@
     </div>
   </div>
 
+  <div class="modal-backdrop" id="tierModal" hidden>
+    <div class="modal-panel tier-panel">
+      <div class="tier-head">
+        <h3>블롭 피규어 티어 정리</h3>
+        <button class="tier-close" id="tierCloseBtn" type="button">×</button>
+      </div>
+      <div class="tier-standard">기준: 신화 100% 수치 기준</div>
+      <div class="tier-board" id="tierBoard"></div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="tierDetailModal" hidden>
+    <div class="modal-panel tier-detail-panel">
+      <div class="tier-head">
+        <h3>피규어 설명</h3>
+        <button class="tier-close" id="tierDetailCloseBtn" type="button">×</button>
+      </div>
+      <div class="tier-detail" id="tierDetailContent"></div>
+    </div>
+  </div>
+
   <div class="modal-backdrop" id="expectResultModal" hidden>
     <div class="modal-panel result-panel">
       <h3>기대값 결과</h3>
@@ -1468,6 +1724,87 @@
       { name: "산타블롭", emoji: "🎅", color: "#ff5858", special: "santa", ranges: [[5,40],[40,80],[80,120],[120,160],[160,200]], integer: true },
     ];
 
+    const tierDescriptions = {
+      "외눈블롭": {
+        tier: "0티어",
+        effect: "현재 보유 영웅 수 × 0.5% 피해 증가",
+        calc: ["영웅 30마리 기준: 30 × 0.5% = 15%"],
+        review: "최종 데미지 15% 상승. 곱연산으로 적용되어 효율이 가장 높음.",
+      },
+      "워터블롭": {
+        tier: "0티어",
+        effect: "보스피해 15% 증가",
+        calc: ["기존 보스피해: 대검 20% + 포세이돈 명함 15% + 펫 종합렙 2% = 37%", "워터 적용 후: 37% + 15% = 52%", "1.52 ÷ 1.37 = 1.109489"],
+        review: "최종 데미지 약 10.95% 상승. 보스전 기준 최상위 효율.",
+      },
+      "드래곤블롭": {
+        tier: "1티어",
+        effect: "치명타 확률 5% 증가",
+        calc: ["기대값: (치명타 확률 × 치명타 데미지) + (1 - 치명타 확률) × 일반 데미지", "기존: 0.005 × 2.75 + 0.995 × 1 = 1.00875", "드래곤 적용 후: 0.055 × 2.75 + 0.945 × 1 = 1.09625", "1.09625 ÷ 1.00875 = 1.0867"],
+        review: "최종 데미지 약 8.68% 상승. 치명타 확률 증가로 기대 딜 상승량이 높음.",
+      },
+      "빵블롭": {
+        tier: "1티어",
+        effect: "스킬 발동 확률 2% 증가",
+        calc: ["스킬 발동 확률에 +2% 적용"],
+        review: "단순 피해 증가가 아니라 스킬 발동 횟수를 늘리는 피규어. 오크주술사 스킬, 마마 임프 생성 스킬, 채드 감염탄 등 발동형 스킬과 궁합이 좋아 실전 효율이 높음.",
+      },
+      "밤바블롭": {
+        tier: "2티어",
+        effect: "기절한 적에게 주는 피해 10% 증가",
+        calc: ["기존 기절 피해: 유물 폭탄 20%", "밤바 적용 후: 20% + 10% = 30%", "1.30 ÷ 1.20 = 1.0833"],
+        review: "최종 데미지 약 8.33% 상승. 기절 상태 유지가 가능하면 효율이 좋음.",
+      },
+      "용암블롭": {
+        tier: "2티어",
+        effect: "스킬피해 10% 증가",
+        calc: ["기존 스킬피해: 유물 비전서 20%", "용암 적용 후: 20% + 10% = 30%", "1.30 ÷ 1.20 = 1.0833"],
+        review: "최종 데미지 약 8.33% 상승. 궁극기 데미지에도 적용 확인되어 가치가 높음.",
+      },
+      "산타블롭": {
+        tier: "2티어",
+        effect: "골렘 처치 시 코인 지급",
+        calc: ["신화 100% 기준 골렘 처치 시 200 코인 지급"],
+        review: "금고 수익 증가 피규어. 신 모드 이하에서는 딜 상승 기댓값이 매우 높으며, 태초 모드에서도 산타 기준 약 9.49% 추가 딜 상승 기대값을 보임. 대전에서도 사용하기 좋아 실전 활용도가 높음.",
+      },
+      "짜부블롭": {
+        tier: "3티어",
+        effect: "범위 피해 15% 증가",
+        calc: ["기존 범위피해 3% 기준", "짜부 적용 후: 3% + 15% = 18%", "1.18 ÷ 1.03 = 1.1456"],
+        review: "최종 데미지 약 14.56% 상승. 범위 피해 비중이 높은 조합에서 효율적.",
+      },
+      "가면블롭": {
+        tier: "3티어",
+        effect: "단일 피해 15% 증가",
+        calc: ["기존 단일피해 3% 기준", "가면 적용 후: 3% + 15% = 18%", "1.18 ÷ 1.03 = 1.1456"],
+        review: "최종 데미지 약 14.56% 상승. 단일 대상 콘텐츠, 특히 길드레이드에서 활용 가능.",
+      },
+      "사이보그블롭": {
+        tier: "4티어",
+        effect: "물리피해 10% 증가",
+        calc: ["기존 물리피해: 유물 15% + 펫 종합렙 5% + 냥법 보물 15% = 35%", "사이보그 적용 후: 35% + 10% = 45%", "1.45 ÷ 1.35 = 1.0741"],
+        review: "최종 데미지 약 7.41% 상승. 물리 메타에서 타협용으로 채용 가능.",
+      },
+      "스컬블롭": {
+        tier: "4티어",
+        effect: "마법피해 10% 증가",
+        calc: ["기존 마법피해: 유물 15% + 펫 종합렙 5% + 냥법 보물 15% = 35%", "스컬 적용 후: 35% + 10% = 45%", "1.45 ÷ 1.35 = 1.0741"],
+        review: "최종 데미지 약 7.41% 상승. 마법 메타에서 채용 가능.",
+      },
+    };
+
+    const tierRows = [
+      { label: "0티어", className: "t0", names: ["외눈블롭", "워터블롭"] },
+      { label: "1티어", className: "t1", names: ["드래곤블롭", "빵블롭"] },
+      { label: "2티어", className: "t2", names: ["밤바블롭", "용암블롭", "산타블롭"] },
+      { label: "3티어", className: "t3", names: ["짜부블롭", "가면블롭"] },
+      { label: "4티어", className: "t4", names: ["사이보그블롭", "스컬블롭"] },
+      { label: "나머지", className: "bad", names: [] },
+    ];
+
+    const tierListedNames = new Set(tierRows.flatMap(row => row.names));
+    tierRows[tierRows.length - 1].names = figures.map(fig => fig.name).filter(name => !tierListedNames.has(name));
+
     let slots = [];
     let gauge = 0;
     let usedKeys = 0;
@@ -1487,7 +1824,8 @@
     let expectationAnimating = false;
     let expectationPreviewSlots = [];
     let drawAnimating = false;
-    let drawPreviewSlots = [];
+    let drawGlowIndexes = [];
+    let drawGlowTimer = null;
     let targetSlots = Array.from({ length: 5 }, () => null);
 
     const $ = (id) => document.getElementById(id);
@@ -1542,6 +1880,66 @@
       return `<img src="${imagePath(figure)}" alt="${safeName}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><span class="fallback-emoji">${figure.emoji}</span>`;
     }
 
+    function figureByName(name) {
+      return figures.find(fig => fig.name === name) || figures[0];
+    }
+
+    function tierFigureButton(name) {
+      const fig = figureByName(name);
+      const hasDetail = !!tierDescriptions[name];
+      const disabled = hasDetail ? "" : " disabled";
+      return `
+        <button class="tier-figure" type="button" data-name="${escapeHtml(name)}"${disabled}>
+          <span class="tier-figure-icon">${figureVisual(fig)}</span>
+          <span>${escapeHtml(name.replace("블롭", ""))}</span>
+        </button>
+      `;
+    }
+
+    function renderTierBoard() {
+      $("tierBoard").innerHTML = tierRows.map(row => `
+        <div class="tier-row">
+          <div class="tier-label ${row.className}">${row.label}</div>
+          <div class="tier-figures">${row.names.map(tierFigureButton).join("")}</div>
+        </div>
+      `).join("");
+    }
+
+    function showTierDetail(name) {
+      const detail = tierDescriptions[name];
+      if (!detail) return;
+      const fig = figureByName(name);
+      document.querySelectorAll(".tier-figure").forEach(button => {
+        button.classList.toggle("active", button.dataset.name === name);
+      });
+      $("tierDetailContent").innerHTML = `
+        <div class="tier-detail-title">
+          <span class="tier-figure-icon">${figureVisual(fig)}</span>
+          <span>${escapeHtml(detail.tier)} · ${escapeHtml(name)}</span>
+        </div>
+        <div class="tier-detail-section"><b>효과</b><br>${escapeHtml(detail.effect)}</div>
+        <div class="tier-detail-section"><b>계산식</b><br>${detail.calc.map(escapeHtml).join("<br>")}</div>
+        <div class="tier-detail-section"><b>평가</b><br>${escapeHtml(detail.review)}</div>
+      `;
+      $("tierDetailModal").hidden = false;
+    }
+
+    function openTierModal() {
+      renderTierBoard();
+      $("tierDetailModal").hidden = true;
+      $("tierDetailContent").innerHTML = "";
+      $("tierModal").hidden = false;
+    }
+
+    function closeTierModal() {
+      $("tierModal").hidden = true;
+      closeTierDetailModal();
+    }
+
+    function closeTierDetailModal() {
+      $("tierDetailModal").hidden = true;
+    }
+
     function buildEffect(slot) {
       const fig = slot.figure;
       const gradeIndex = grades.indexOf(slot.grade);
@@ -1575,6 +1973,9 @@
     }
 
     function getLockCount() {
+      if (expectationMode) {
+        return slots.filter(isExpectationCurrentSlot).length;
+      }
       return slots.filter(s => !s.empty && s.locked).length;
     }
 
@@ -1836,7 +2237,7 @@
           render();
           return;
         }
-        slots[editingSlotIndex] = { figure: fig, grade, percent, locked: expectationMode ? true : false, manual: true };
+        slots[editingSlotIndex] = { figure: fig, grade, percent, locked: expectationMode ? true : false, manual: true, expectationCurrent: expectationMode };
         if (expectationMode) targetSlots[editingSlotIndex] = null;
         addLog(`${expectationMode ? "현재 " : ""}${fig.name} ${grade}(${percent}%) 슬롯 세팅`);
       }
@@ -1941,6 +2342,7 @@
       const lockedNames = new Set(slots.filter(s => !s.empty && s.locked).map(s => s.figure.name));
       const pool = figures.filter(f => !lockedNames.has(f.name));
       const changed = [];
+      const changedIndexes = [];
 
       let guaranteedSlotIndex = null;
       let guaranteedFigure = null;
@@ -1965,6 +2367,7 @@
         slots[idx] = newSlot;
         gradeStats[grade] += 1;
         changed.push(`${fig.name} ${grade}(${newSlot.percent}%)`);
+        changedIndexes.push(idx);
       }
 
       if (simulatorMode) keyBalance -= cost;
@@ -1978,6 +2381,7 @@
 
       addLog(`${drawCount}회차 · 🔑${cost} 사용 · ${isGuaranteed ? "<b>신화 확정</b> · " : ""}${changed.join(", ")}`);
       if (renderAfter) render();
+      return changedIndexes;
     }
 
     function addLog(text) {
@@ -2000,11 +2404,20 @@
       expectationResultHtml = "";
       expectationAnimating = false;
       expectationPreviewSlots = [];
+      drawAnimating = false;
+      drawGlowIndexes = [];
+      if (drawGlowTimer) {
+        clearTimeout(drawGlowTimer);
+        drawGlowTimer = null;
+      }
       $("slotModal").hidden = true;
       $("keyModal").hidden = true;
       $("gaugeModal").hidden = true;
       $("expectResultModal").hidden = true;
       $("expectModal").hidden = true;
+      $("mythicConfirmModal").hidden = true;
+      $("tierModal").hidden = true;
+      $("tierDetailModal").hidden = true;
       createEmptySlots();
       createEmptyTargetSlots();
       render();
@@ -2029,6 +2442,7 @@
 
     function currentSimSlots() {
       return slots.map(slot => {
+        if (expectationMode && !isExpectationCurrentSlot(slot)) return { empty: true, locked: false };
         if (!slot || slot.empty) return { empty: true, locked: false };
         return {
           empty: false,
@@ -2225,37 +2639,28 @@
       };
     }
 
-    function refreshDrawPreviewSlots() {
-      drawPreviewSlots = slots.map(slot => {
-        if (slot && !slot.empty && slot.locked) return slot;
-        return randomPreviewSlot();
-      });
-    }
-
-    function playDrawAnimation(duration = 620) {
-      if (drawAnimating) return Promise.resolve();
+    function playDrawHighlight(indexes, duration = 760) {
+      if (drawGlowTimer) {
+        clearTimeout(drawGlowTimer);
+        drawGlowTimer = null;
+      }
       drawAnimating = true;
-      const startedAt = Date.now();
-
-      return new Promise(resolve => {
-        let timer = null;
-        const tick = () => {
-          refreshDrawPreviewSlots();
-          render();
-          if (Date.now() - startedAt < duration) return;
-          if (timer) clearInterval(timer);
-          drawAnimating = false;
-          drawPreviewSlots = [];
-          render();
-          resolve();
-        };
-        tick();
-        timer = setInterval(tick, 65);
-      });
+      drawGlowIndexes = indexes;
+      render();
+      drawGlowTimer = setTimeout(() => {
+        drawAnimating = false;
+        drawGlowIndexes = [];
+        drawGlowTimer = null;
+        render();
+      }, duration);
     }
 
     function hasUnlockedMythicSlot() {
       return slots.some(slot => slot && !slot.empty && !slot.locked && gradeIndexOf(slot.grade) >= gradeIndexOf("신화"));
+    }
+
+    function isExpectationCurrentSlot(slot) {
+      return expectationMode && slot && !slot.empty && slot.expectationCurrent && slot.locked;
     }
 
     function openMythicConfirm() {
@@ -2266,8 +2671,7 @@
       $("mythicConfirmModal").hidden = true;
     }
 
-    async function performDrawWithAnimation(skipMythicConfirm = false) {
-      if (drawAnimating) return;
+    function performDrawWithAnimation(skipMythicConfirm = false) {
       const cost = getCost();
       if (simulatorMode && keyBalance < cost) {
         drawOnce(true);
@@ -2278,8 +2682,8 @@
         return;
       }
       closeMythicConfirm();
-      await playDrawAnimation();
-      drawOnce(true);
+      const changedIndexes = drawOnce(false) || [];
+      playDrawHighlight(changedIndexes);
     }
 
     function refreshExpectationPreviewSlots() {
@@ -2512,8 +2916,18 @@
     }
 
     function openExpectationMode() {
+      closeMythicConfirm();
+      drawAnimating = false;
+      drawGlowIndexes = [];
+      if (drawGlowTimer) {
+        clearTimeout(drawGlowTimer);
+        drawGlowTimer = null;
+      }
       expectationMode = true;
       expectationResultHtml = "";
+      simulatorMode = false;
+      keyBalance = 0;
+      gauge = 0;
       $("expectModal").hidden = true;
       $("expectResultModal").hidden = true;
       hideSimFigureOptions();
@@ -2664,7 +3078,7 @@
     function renderExpectationCards() {
       $("resultCards").innerHTML = slots.map((slot, i) => {
         const target = targetSlots[i];
-        if (slot && !slot.empty) {
+        if (isExpectationCurrentSlot(slot)) {
           const cls = gradeClass[slot.grade];
           return `
             <div class="card ${cls} locked expect-slot-card" onclick="openSlotSetup(${i}, 'current')">
@@ -2718,7 +3132,8 @@
 
     function renderStage() {
       $("slotStage").innerHTML = slots.map((slot, i) => {
-        if (expectationMode && expectationAnimating && (!slot || slot.empty || !slot.locked)) {
+        const visibleSlot = expectationMode && !isExpectationCurrentSlot(slot) ? { empty: true, locked: false } : slot;
+        if (expectationMode && expectationAnimating && (!visibleSlot || visibleSlot.empty || !visibleSlot.locked)) {
           const preview = expectationPreviewSlots[i] || randomPreviewSlot();
           return `
             <div class="slot-stand ${gradeClass[preview.grade]} rolling" data-index="${i}" title="시뮬레이션 중">
@@ -2728,7 +3143,7 @@
           `;
         }
         const target = expectationMode ? targetSlots[i] : null;
-        if (target && !target.empty && (!slot || slot.empty)) {
+        if (target && !target.empty && (!visibleSlot || visibleSlot.empty)) {
           const primary = primaryTargetOption(target);
           return `
             <div class="slot-stand ${targetGroupClass(target)} target" data-index="${i}" onclick="openSlotSetup(${i}, 'target')" title="목표 ${escapeHtml(describeTargetGroup(target))}">
@@ -2737,7 +3152,7 @@
             </div>
           `;
         }
-        if (slot.empty) {
+        if (!visibleSlot || visibleSlot.empty) {
           return `
             <div class="slot-stand empty" data-index="${i}" onclick="openSlotSetup(${i}, 'current')" title="빈 슬롯 세팅">
               <div class="figure-icon empty-figure">?</div>
@@ -2746,8 +3161,8 @@
           `;
         }
         return `
-          <div class="slot-stand ${gradeClass[slot.grade]} ${slot.locked ? "locked" : ""}" data-index="${i}" onclick="toggleLock(${i})" title="${escapeHtml(slot.figure.name)} ${slot.grade} (${slot.percent}%)">
-            <div class="figure-icon">${figureVisual(slot.figure)}</div>
+          <div class="slot-stand ${gradeClass[visibleSlot.grade]} ${visibleSlot.locked ? "locked" : ""}" data-index="${i}" onclick="toggleLock(${i})" title="${escapeHtml(visibleSlot.figure.name)} ${visibleSlot.grade} (${visibleSlot.percent}%)">
+            <div class="figure-icon">${figureVisual(visibleSlot.figure)}</div>
             <div class="pedestal"></div>
           </div>
         `;
@@ -2774,7 +3189,7 @@
         }
         const cls = gradeClass[slot.grade];
         return `
-          <div class="card ${cls} ${slot.locked ? "locked" : ""}">
+          <div class="card ${cls} ${slot.locked ? "locked" : ""} ${drawAnimating && drawGlowIndexes.includes(i) ? "draw-glow" : ""}">
             <div class="mini-icon">${figureVisual(slot.figure)}</div>
             <div>
               <div class="card-title">${slot.figure.name} <span class="grade-name">${slot.grade}</span> <span class="grade-percent">(${slot.percent}%)</span></div>
@@ -2801,7 +3216,7 @@
         ? (expectationAnimating ? `계산중<span class="cost">ROLL</span>` : `기대값 계산<span class="cost">${expectationRunCount}회</span>`)
         : `뽑기<span class="cost">🔑 <span id="drawCost">${cost}</span></span>`;
       $("gaugeInput").value = gauge;
-      $("usedKeysTop").textContent = simulatorMode ? keyBalance : usedKeys;
+      $("usedKeysTop").textContent = expectationMode ? (simulatorMode ? keyBalance : 0) : (simulatorMode ? keyBalance : usedKeys);
       $("usedKeysStat").textContent = usedKeys;
       $("totalFigureCount").textContent = totalFigures;
       $("lockCount").textContent = lockCount;
@@ -2834,8 +3249,11 @@
 
     $("drawBtn").addEventListener("click", () => {
       if (expectationMode) runExpectationModeSimulation();
-      else drawOnce(true);
+      else performDrawWithAnimation(false);
     });
+    $("tierBtn").addEventListener("click", openTierModal);
+    $("tierCloseBtn").addEventListener("click", closeTierModal);
+    $("tierDetailCloseBtn").addEventListener("click", closeTierDetailModal);
     $("resetBtn").addEventListener("click", resetAll);
     $("gaugeInput").addEventListener("change", () => { applyGaugeInput(); render(); });
     $("keyBadge").addEventListener("click", openKeySetup);
@@ -2870,6 +3288,16 @@
     $("slotModal").addEventListener("click", (event) => { if (event.target === $("slotModal")) closeSlotSetup(); });
     $("keyModal").addEventListener("click", (event) => { if (event.target === $("keyModal")) closeKeySetup(); });
     $("gaugeModal").addEventListener("click", (event) => { if (event.target === $("gaugeModal")) closeGaugeSetup(); });
+    $("tierModal").addEventListener("click", (event) => {
+      if (event.target === $("tierModal")) {
+        closeTierModal();
+        return;
+      }
+      const button = event.target.closest(".tier-figure");
+      if (!button || button.disabled) return;
+      showTierDetail(button.dataset.name);
+    });
+    $("tierDetailModal").addEventListener("click", (event) => { if (event.target === $("tierDetailModal")) closeTierDetailModal(); });
     $("expectResultModal").addEventListener("click", (event) => { if (event.target === $("expectResultModal")) closeExpectationResultModal(); });
     $("targetOptionList").addEventListener("click", (event) => {
       const chip = event.target.closest(".target-chip");
@@ -2914,13 +3342,19 @@
     $("expectCloseBtn").addEventListener("click", closeExpectationMode);
     $("expectRunBtn").addEventListener("click", runExpectationSimulation);
     $("expectModal").addEventListener("click", (event) => { if (event.target === $("expectModal")) closeExpectationMode(); });
+    $("mythicCancelBtn").addEventListener("click", closeMythicConfirm);
+    $("mythicDrawBtn").addEventListener("click", () => performDrawWithAnimation(true));
+    $("mythicConfirmModal").addEventListener("click", (event) => { if (event.target === $("mythicConfirmModal")) closeMythicConfirm(); });
     document.addEventListener("keydown", (event) => {
       if (event.key !== "Escape") return;
-      const hadOpenModal = !$("slotModal").hidden || !$("keyModal").hidden || !$("gaugeModal").hidden || !$("expectModal").hidden || !$("expectResultModal").hidden;
+      const hadOpenModal = !$("slotModal").hidden || !$("keyModal").hidden || !$("gaugeModal").hidden || !$("expectModal").hidden || !$("expectResultModal").hidden || !$("mythicConfirmModal").hidden || !$("tierModal").hidden || !$("tierDetailModal").hidden;
       closeSlotSetup();
       closeKeySetup();
       closeGaugeSetup();
       closeExpectationResultModal();
+      closeMythicConfirm();
+      closeTierModal();
+      closeTierDetailModal();
       $("expectModal").hidden = true;
       hideSimFigureOptions();
       if (!hadOpenModal) closeExpectationMode();
