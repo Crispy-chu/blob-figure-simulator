@@ -749,6 +749,263 @@
       color: #bcc8d3;
       font-size: 11px;
     }
+    body.expect-mode .stat-grid { display: none; }
+    body.expect-mode .log { max-height: 240px; }
+    body.expect-mode .info-btn {
+      background: linear-gradient(180deg, #6b7684, #313a49);
+    }
+    body.expect-mode .main-draw {
+      background: linear-gradient(180deg, #79e7ff, #29bdd9 58%, #1596b5);
+      border-color: #0e5264;
+      color: #072733;
+    }
+    .info-btn {
+      font-size: 11px;
+      line-height: 1.08;
+      padding: 0 5px;
+      word-break: keep-all;
+    }
+    .slot-stand.rolling {
+      animation: rollShake .1s infinite alternate;
+    }
+    .slot-stand.rolling .figure-icon {
+      filter: saturate(1.15) brightness(1.08);
+    }
+    .slot-stand.draw-glow .figure-icon {
+      filter: saturate(1.25) brightness(1.32);
+      box-shadow: inset 0 -6px 0 rgba(0,0,0,.08), 0 0 22px rgba(255,255,255,.65), 0 0 14px rgba(137,225,255,.62);
+    }
+    .machine.draw-glow::before {
+      box-shadow: inset 0 4px 0 rgba(255,255,255,.32), 0 5px 0 rgba(0,0,0,.5), 0 0 24px rgba(145,229,255,.34);
+    }
+    @keyframes rollShake {
+      from { transform: translateX(-50%) translateY(-1px) rotate(-1deg); }
+      to { transform: translateX(-50%) translateY(2px) rotate(1deg); }
+    }
+    .card.expect-card {
+      grid-template-columns: 1fr 92px;
+      align-items: stretch;
+      min-height: 86px;
+      background: linear-gradient(180deg, #eef2f6, #cfd7df);
+      border-color: #536273;
+      color: #15191f;
+      cursor: default;
+    }
+    .expect-lines {
+      display: grid;
+      gap: 6px;
+      min-width: 0;
+    }
+    .expect-line {
+      display: grid;
+      grid-template-columns: 38px 1fr;
+      align-items: center;
+      gap: 6px;
+      min-height: 31px;
+      padding: 5px 7px;
+      border: 2px solid rgba(15, 21, 30, .22);
+      border-radius: 7px;
+      background: rgba(255,255,255,.55);
+      box-shadow: inset 0 2px 0 rgba(255,255,255,.44);
+      min-width: 0;
+    }
+    .expect-line.normal { background: linear-gradient(180deg, #E7E5E1, var(--normal)); }
+    .expect-line.rare { background: linear-gradient(180deg, #BDE8FA, var(--rare)); }
+    .expect-line.hero { background: linear-gradient(180deg, #E4CDFB, var(--hero)); }
+    .expect-line.legend { background: linear-gradient(180deg, #FFE38F, var(--legend)); }
+    .expect-line.mythic { background: linear-gradient(180deg, #FFC46E, var(--mythic)); }
+    .expect-label {
+      font-size: 11px;
+      font-weight: 900;
+      color: #3a4551;
+    }
+    .expect-value {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 12px;
+      font-weight: 900;
+      color: #15191f;
+    }
+    .expect-value.empty {
+      color: #6b7480;
+      font-weight: 850;
+    }
+    .expect-actions {
+      display: grid;
+      grid-template-rows: 1fr 1fr;
+      gap: 6px;
+    }
+    .expect-action {
+      min-height: 31px;
+      border-radius: 7px;
+      border: 2px solid #26313c;
+      background: linear-gradient(180deg, #9aa7b5, #566372);
+      color: #fff;
+      font: inherit;
+      font-size: 11px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: inset 0 2px 0 rgba(255,255,255,.22), 0 2px 0 rgba(0,0,0,.35);
+    }
+    .expect-action.primary {
+      background: linear-gradient(180deg, #fff36b, #ffc400);
+      color: #2d2302;
+      border-color: #765711;
+    }
+    .expect-target-panel {
+      display: grid;
+      gap: 6px;
+      padding: 8px;
+      border: 3px solid #536273;
+      border-radius: 7px;
+      background: linear-gradient(180deg, #263241, #151e2b);
+      box-shadow: inset 0 3px 0 rgba(255,255,255,.12), 0 2px 0 rgba(0,0,0,.5);
+    }
+    .expect-target-title {
+      color: #f8fbff;
+      font-size: 12px;
+      font-weight: 900;
+      text-shadow: 0 2px 0 rgba(0,0,0,.45);
+    }
+    .expect-target-row {
+      display: grid;
+      grid-template-columns: 42px 1fr 56px;
+      align-items: center;
+      gap: 6px;
+      min-height: 38px;
+      padding: 5px 6px;
+      border: 2px solid rgba(15, 21, 30, .35);
+      border-radius: 7px;
+      background: #eef2f6;
+      color: #15191f;
+    }
+    .expect-target-row.normal { background: linear-gradient(180deg, #E7E5E1, var(--normal)); }
+    .expect-target-row.rare { background: linear-gradient(180deg, #BDE8FA, var(--rare)); }
+    .expect-target-row.hero { background: linear-gradient(180deg, #E4CDFB, var(--hero)); }
+    .expect-target-row.legend { background: linear-gradient(180deg, #FFE38F, var(--legend)); }
+    .expect-target-row.mythic { background: linear-gradient(180deg, #FFC46E, var(--mythic)); }
+    .expect-target-index,
+    .expect-target-value {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .expect-target-value.empty { color: #6b7480; }
+    .expect-target-row button {
+      min-height: 27px;
+      border-radius: 7px;
+      border: 2px solid #26313c;
+      background: linear-gradient(180deg, #9aa7b5, #566372);
+      color: #fff;
+      font: inherit;
+      font-size: 11px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: inset 0 2px 0 rgba(255,255,255,.22), 0 2px 0 rgba(0,0,0,.35);
+    }
+    .card.expect-current.empty {
+      cursor: pointer;
+    }
+    .card.expect-slot-card {
+      grid-template-columns: 47px 1fr 78px;
+      cursor: default;
+    }
+    .card.expect-slot-card.target {
+      outline: 2px dashed rgba(255,255,255,.46);
+      outline-offset: -6px;
+    }
+    .slot-stand.target .figure-icon {
+      border-style: dashed;
+      box-shadow: inset 0 -6px 0 rgba(0,0,0,.12), 0 0 14px rgba(255,255,255,.18);
+    }
+    .expect-badge {
+      display: inline-block;
+      margin-right: 4px;
+      padding: 1px 5px;
+      border-radius: 5px;
+      background: rgba(0,0,0,.2);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 900;
+      text-shadow: 0 1px 0 rgba(0,0,0,.5);
+      vertical-align: 1px;
+    }
+    .expect-choice-actions {
+      display: grid;
+      grid-template-rows: 1fr 1fr;
+      gap: 5px;
+    }
+    .expect-choice-actions button {
+      min-height: 28px;
+      border-radius: 7px;
+      border: 2px solid #26313c;
+      background: linear-gradient(180deg, #9aa7b5, #566372);
+      color: #fff;
+      font: inherit;
+      font-size: 10px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: inset 0 2px 0 rgba(255,255,255,.22), 0 2px 0 rgba(0,0,0,.35);
+    }
+    .expect-choice-actions .primary {
+      background: linear-gradient(180deg, #fff36b, #ffc400);
+      color: #2d2302;
+      border-color: #765711;
+    }
+    .expect-placeholder,
+    .expect-result {
+      display: grid;
+      gap: 7px;
+    }
+    .expect-summary {
+      padding: 8px;
+      border-radius: 7px;
+      background: rgba(255,255,255,.08);
+      color: #d4dde8;
+      font-size: 11px;
+      line-height: 1.35;
+      font-weight: 800;
+    }
+    .modal-actions.with-clear {
+      grid-template-columns: .9fr 1fr 1fr;
+    }
+    .modal-actions.single {
+      grid-template-columns: 1fr;
+    }
+    .modal-clear {
+      background: linear-gradient(180deg, #777f8a, #3f4854);
+      color: #fff;
+    }
+    .result-panel {
+      width: min(344px, 100%);
+      max-height: min(76vh, 620px);
+      overflow: auto;
+    }
+    .confirm-copy {
+      display: grid;
+      gap: 8px;
+      padding: 8px 4px 2px;
+      font-weight: 900;
+      line-height: 1.35;
+      text-align: center;
+    }
+    .confirm-copy .confirm-main {
+      color: #111820;
+      background: #eef2f6;
+      border: 2px solid #0c141d;
+      border-radius: 8px;
+      padding: 9px 7px;
+    }
+    .confirm-copy .confirm-warn {
+      color: #ff3d3d;
+      text-shadow: 0 2px 0 rgba(0,0,0,.55);
+      font-size: 14px;
+    }
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -848,6 +1105,108 @@
       background: #cfe7f5;
       outline: none;
     }
+    .expect-panel {
+      max-height: min(76vh, 620px);
+      overflow: auto;
+    }
+    .target-combo {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr 54px 54px;
+      gap: 6px;
+    }
+    .target-combo button {
+      min-height: 38px;
+      border: 2px solid #0a1119;
+      border-radius: 8px;
+      background: linear-gradient(180deg, #9aa7b5, #4b596a);
+      color: #fff;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: inset 0 2px 0 rgba(255,255,255,.18), 0 2px 0 rgba(0,0,0,.35);
+    }
+    .target-list {
+      min-height: 38px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      padding: 6px;
+      border-radius: 8px;
+      background: rgba(0,0,0,.24);
+      border: 1px solid rgba(255,255,255,.12);
+    }
+    .target-chip {
+      border: 0;
+      border-radius: 14px;
+      padding: 5px 8px;
+      background: #eef2f6;
+      color: #15191f;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .target-empty {
+      color: #aeb9c7;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 5px 2px;
+    }
+    .target-editor {
+      display: grid;
+      gap: 7px;
+    }
+    .target-editor[hidden] { display: none; }
+    .target-add-btn {
+      min-height: 34px;
+      border: 2px solid #0a1119;
+      border-radius: 8px;
+      background: linear-gradient(180deg, #79e7ff, #209eb8);
+      color: #072733;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: inset 0 2px 0 rgba(255,255,255,.25), 0 2px 0 rgba(0,0,0,.35);
+    }
+    .target-chip {
+      text-align: left;
+    }
+    .sim-note {
+      color: #aeb9c7;
+      font-size: 11px;
+      line-height: 1.35;
+    }
+    .sim-result {
+      margin-top: 12px;
+      display: grid;
+      gap: 7px;
+    }
+    .sim-result-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px;
+      border-radius: 7px;
+      background: rgba(0,0,0,.26);
+      font-size: 12px;
+      font-weight: 850;
+    }
+    .sim-result-row b {
+      color: #ffe45a;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+    .sim-result-warn {
+      padding: 8px;
+      border-radius: 7px;
+      background: rgba(253,167,66,.16);
+      color: #ffd7a0;
+      font-size: 11px;
+      line-height: 1.35;
+    }
     .modal-actions {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -918,14 +1277,14 @@
     <section class="results" id="resultCards"></section>
 
     <section class="draw-area">
-      <button class="info-btn" id="helpBtn">?</button>
+      <button class="info-btn" id="helpBtn">기대값<br>모드</button>
       <button class="main-draw" id="drawBtn">뽑기<span class="cost">🔑 <span id="drawCost">5</span></span></button>
       <div class="pity-box" id="pityBox" title="확정 게이지 세팅">신화 등급 확정까지<div class="pity-count" id="pityText">0/500</div></div>
     </section>
 
     <section class="stats">
-      <h2>뽑기 통계</h2>
-      <div class="stat-grid">
+      <h2 id="statsTitle">뽑기 통계</h2>
+      <div class="stat-grid" id="statGrid">
         <div class="stat-item">뽑기 횟수<span id="drawCount">0</span></div>
         <div class="stat-item">총 등장<span id="totalFigureCount">0</span></div>
         <div class="stat-item">사용 열쇠<span id="usedKeysStat">0</span></div>
@@ -945,12 +1304,12 @@
 
   <div class="modal-backdrop" id="slotModal" hidden>
     <div class="modal-panel">
-      <h3>빈 슬롯 세팅</h3>
+      <h3 id="slotModalTitle">빈 슬롯 세팅</h3>
       <div class="modal-grid">
-        <label class="modal-field">피규어
+        <label class="modal-field"><span id="slotFigureLabel">피규어</span>
           <div class="figure-combo">
             <input id="slotFigureInput" type="text" autocomplete="off" placeholder="피규어 이름 입력" />
-            <button type="button" id="figureListToggle">변경</button>
+            <button type="button" id="figureListToggle">선택</button>
             <div class="figure-options" id="slotFigureOptions" hidden></div>
           </div>
         </label>
@@ -960,8 +1319,13 @@
         <label class="modal-field">퍼센트
           <input id="slotPercentInput" type="number" min="1" max="100" step="1" value="100" />
         </label>
+        <div class="target-editor" id="targetOptionEditor" hidden>
+          <button type="button" class="target-add-btn" id="targetOptionAddBtn">후보 추가</button>
+          <div class="target-list" id="targetOptionList"></div>
+        </div>
       </div>
-      <div class="modal-actions">
+      <div class="modal-actions" id="slotModalActions">
+        <button class="modal-clear" id="slotClearBtn" hidden>비우기</button>
         <button class="modal-cancel" id="slotCancelBtn">취소</button>
         <button class="modal-apply" id="slotApplyBtn">적용</button>
       </div>
@@ -998,10 +1362,78 @@
     </div>
   </div>
 
+  <div class="modal-backdrop" id="mythicConfirmModal" hidden>
+    <div class="modal-panel">
+      <div class="confirm-copy">
+        <div class="confirm-main">신화 등급 이상의 피규어가 있습니다.</div>
+        <div class="confirm-warn">그래도 뽑기를 하시겠습니까?</div>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-cancel" id="mythicCancelBtn">취소</button>
+        <button class="modal-apply" id="mythicDrawBtn">뽑기</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="expectResultModal" hidden>
+    <div class="modal-panel result-panel">
+      <h3>기대값 결과</h3>
+      <div class="sim-result" id="expectResultContent"></div>
+      <div class="modal-actions single">
+        <button class="modal-apply" id="expectResultCloseBtn">확인</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="expectModal" hidden>
+    <div class="modal-panel expect-panel">
+      <h3>기대값 시뮬레이션</h3>
+      <div class="modal-grid">
+        <label class="modal-field">목표 피규어
+          <div class="target-combo">
+            <input id="simFigureInput" type="text" autocomplete="off" placeholder="피규어 이름 입력" />
+            <button type="button" id="simFigureListToggle">선택</button>
+            <button type="button" id="simFigureAddBtn">추가</button>
+            <div class="figure-options" id="simFigureOptions" hidden></div>
+          </div>
+        </label>
+        <div class="target-list" id="simTargetList">
+          <span class="target-empty">목표 피규어를 추가하세요.</span>
+        </div>
+        <label class="modal-field">등급 이상
+          <select id="simGradeSelect"></select>
+        </label>
+        <label class="modal-field">퍼센트 이상
+          <input id="simPercentInput" type="number" min="1" max="100" step="1" value="1" />
+        </label>
+        <label class="modal-field">목표 개수
+          <input id="simGoalCountInput" type="number" min="1" max="30" step="1" value="1" />
+        </label>
+        <label class="modal-field">평가 열쇠
+          <input id="simKeyBudgetInput" type="number" min="0" step="1" value="1000" />
+        </label>
+        <label class="modal-field">반복 횟수
+          <input id="simRunCountInput" type="number" min="1000" max="50000" step="1000" value="5000" />
+        </label>
+        <div class="sim-note">현재 슬롯, 잠금, 보유 열쇠, 신화 확정 게이지를 시작 상태로 복사해서 계산합니다. 목표가 뜨면 최대 3개까지 자동 잠금하고, 그 이후에는 남은 슬롯에서 동시에 목표가 떠야 성공합니다.</div>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-cancel" id="expectCloseBtn">닫기</button>
+        <button class="modal-apply" id="expectRunBtn">계산</button>
+      </div>
+      <div class="sim-result" id="simResult"></div>
+    </div>
+  </div>
+
   <script>
     const grades = ["일반", "희귀", "영웅", "전설", "신화"];
+    const gradeSelectOrder = [...grades].reverse();
     const gradeClass = { 일반: "normal", 희귀: "rare", 영웅: "hero", 전설: "legend", 신화: "mythic" };
     const keyCostByLock = { 0: 5, 1: 10, 2: 20, 3: 30 };
+    const expectationRunCount = 5000;
+    const expectationKeyCap = 80000;
+    const expectationBatchSize = 1;
+    const expectationMaxMs = 6500;
 
     const figures = [
       { name: "다이아블롭", emoji: "💎", color: "#76e7ff", effect: "공격력 증가", unit: "%", ranges: [[0.1,2],[2,4],[4,6],[6,8],[8,10]] },
@@ -1046,6 +1478,17 @@
     let simulatorMode = false;
     let keyBalance = 0;
     let editingSlotIndex = null;
+    let editingSlotKind = "current";
+    let editingTargetOptions = [];
+    let editingTargetInputDirty = false;
+    let simTargets = new Set();
+    let expectationMode = false;
+    let expectationResultHtml = "";
+    let expectationAnimating = false;
+    let expectationPreviewSlots = [];
+    let drawAnimating = false;
+    let drawPreviewSlots = [];
+    let targetSlots = Array.from({ length: 5 }, () => null);
 
     const $ = (id) => document.getElementById(id);
 
@@ -1143,6 +1586,10 @@
       slots = Array.from({ length: 5 }, () => ({ empty: true, locked: false }));
     }
 
+    function createEmptyTargetSlots() {
+      targetSlots = Array.from({ length: 5 }, () => null);
+    }
+
     function clampInt(value, min, max) {
       const parsed = Math.floor(Number(value));
       if (!Number.isFinite(parsed)) return min;
@@ -1150,8 +1597,11 @@
     }
 
     function initSetupControls() {
-      $("slotGradeSelect").innerHTML = grades.map(grade => `<option value="${grade}">${grade}</option>`).join("");
+      $("slotGradeSelect").innerHTML = gradeSelectOrder.map(grade => `<option value="${grade}">${grade}</option>`).join("");
+      $("simGradeSelect").innerHTML = gradeSelectOrder.map(grade => `<option value="${grade}">${grade} 이상</option>`).join("");
       renderFigureOptions("");
+      renderSimFigureOptions("");
+      renderSimTargetList();
     }
 
     function findFigureByInput(value) {
@@ -1195,12 +1645,143 @@
       $("slotFigureOptions").hidden = false;
     }
 
-    function openSlotSetup(index) {
+    function renderSimFigureOptions(filterValue) {
+      const matches = matchingFigures(filterValue);
+      $("simFigureOptions").innerHTML = matches.length
+        ? matches.map(fig => `<button type="button" class="figure-option" data-name="${escapeHtml(fig.name)}">${escapeHtml(fig.name)}</button>`).join("")
+        : `<button type="button" class="figure-option" data-name="${escapeHtml(figures[0].name)}">검색 결과 없음</button>`;
+    }
+
+    function showSimFigureOptions(all = false) {
+      renderSimFigureOptions(all ? "" : $("simFigureInput").value);
+      $("simFigureOptions").hidden = false;
+    }
+
+    function hideSimFigureOptions() {
+      $("simFigureOptions").hidden = true;
+    }
+
+    function addSimTargetFromInput() {
+      const fig = findFigureByInput($("simFigureInput").value);
+      simTargets.add(fig.name);
+      $("simFigureInput").value = "";
+      hideSimFigureOptions();
+      renderSimTargetList();
+    }
+
+    function renderSimTargetList() {
+      const names = [...simTargets];
+      $("simTargetList").innerHTML = names.length
+        ? names.map(name => `<button type="button" class="target-chip" data-name="${escapeHtml(name)}">${escapeHtml(name)} ×</button>`).join("")
+        : `<span class="target-empty">목표 피규어를 추가하세요.</span>`;
+      const currentGoal = clampInt($("simGoalCountInput")?.value || 1, 1, 30);
+      if (names.length && currentGoal > names.length) $("simGoalCountInput").value = names.length;
+    }
+
+    function makeTargetOption(fig, grade, percent) {
+      return {
+        figure: fig,
+        grade,
+        gradeIndex: gradeIndexOf(grade),
+        percent,
+      };
+    }
+
+    function normalizeTargetOptions(target) {
+      if (!target) return [];
+      const rawOptions = Array.isArray(target.options) ? target.options : (target.figure ? [target] : []);
+      return rawOptions
+        .filter(option => option && option.figure)
+        .map(option => makeTargetOption(option.figure, option.grade, option.percent));
+    }
+
+    function targetOptionKey(option) {
+      return `${option.figure.name}|${option.grade}|${option.percent}`;
+    }
+
+    function addEditingTargetOption(option) {
+      const normalized = makeTargetOption(option.figure, option.grade, option.percent);
+      const key = targetOptionKey(normalized);
+      const exists = editingTargetOptions.some(item => targetOptionKey(item) === key);
+      if (exists) return true;
+      if (editingTargetOptions.length >= 5) {
+        addLog("한 목표 칸에는 후보를 최대 5개까지 넣을 수 있습니다.");
+        render();
+        return false;
+      }
+      editingTargetOptions.push(normalized);
+      renderTargetOptionList();
+      return true;
+    }
+
+    function currentTargetOptionFromInputs() {
+      const fig = findFigureByInput($("slotFigureInput").value);
+      const grade = grades.includes($("slotGradeSelect").value) ? $("slotGradeSelect").value : "신화";
+      const percent = clampInt($("slotPercentInput").value, 1, 100);
+      $("slotFigureInput").value = fig.name;
+      return makeTargetOption(fig, grade, percent);
+    }
+
+    function renderTargetOptionList() {
+      if (!$("targetOptionList")) return;
+      $("targetOptionList").innerHTML = editingTargetOptions.length
+        ? editingTargetOptions.map((option, index) => (
+          `<button type="button" class="target-chip" data-index="${index}">${escapeHtml(describeSlot(option, true))} ×</button>`
+        )).join("")
+        : `<span class="target-empty">후보를 추가하세요. 하나만 넣어도 됩니다.</span>`;
+    }
+
+    function addTargetOptionFromModal() {
+      if (editingSlotKind !== "target") return;
+      if (!$("slotFigureInput").value.trim()) {
+        addLog("추가할 목표 후보를 입력해주세요.");
+        renderTargetOptionList();
+        return;
+      }
+      addEditingTargetOption(currentTargetOptionFromInputs());
+      $("slotFigureInput").value = "";
+      editingTargetInputDirty = false;
+      $("slotFigureInput").focus();
+    }
+
+    function describeTargetGroup(target) {
+      const options = normalizeTargetOptions(target);
+      if (!options.length) return "상관없음";
+      if (options.length === 1) return describeSlot(options[0], true);
+      const sameGrade = options.every(option => option.grade === options[0].grade);
+      const samePercent = options.every(option => option.percent === options[0].percent);
+      const names = options.map(option => option.figure.name.replace(/블롭$/, "")).join(" / ");
+      if (sameGrade && samePercent) return `${names} 중 1개 · ${options[0].grade} 이상 (${options[0].percent}% 이상)`;
+      return options.map(option => describeSlot(option, true)).join(" / ");
+    }
+
+    function primaryTargetOption(target) {
+      return normalizeTargetOptions(target)[0] || null;
+    }
+
+    function targetGroupClass(target) {
+      const primary = primaryTargetOption(target);
+      return primary ? gradeClass[primary.grade] : "";
+    }
+
+    function openSlotSetup(index, kind = "current") {
       editingSlotIndex = index;
-      const slot = slots[index];
-      $("slotFigureInput").value = slot && !slot.empty ? slot.figure.name : "";
-      $("slotGradeSelect").value = slot && !slot.empty ? slot.grade : "일반";
-      $("slotPercentInput").value = slot && !slot.empty ? slot.percent : 100;
+      editingSlotKind = expectationMode && kind === "target" ? "target" : "current";
+      const isTarget = editingSlotKind === "target";
+      editingTargetOptions = isTarget ? normalizeTargetOptions(targetSlots[index]) : [];
+      editingTargetInputDirty = false;
+      const slot = isTarget ? primaryTargetOption(targetSlots[index]) : slots[index];
+      const hasSlot = slot && !slot.empty;
+      $("slotModalTitle").textContent = isTarget ? "목표 피규어 설정" : (expectationMode ? "현재 피규어 설정(잠금)" : "빈 슬롯 세팅");
+      $("slotFigureLabel").textContent = isTarget ? "목표 후보" : "피규어";
+      $("slotApplyBtn").textContent = isTarget ? "목표 적용" : "적용";
+      $("slotClearBtn").hidden = !expectationMode;
+      $("slotModalActions").classList.toggle("with-clear", expectationMode);
+      $("targetOptionEditor").hidden = !isTarget;
+      $("slotFigureInput").value = hasSlot ? slot.figure.name : "";
+      $("slotGradeSelect").value = hasSlot ? slot.grade : "신화";
+      $("slotPercentInput").value = hasSlot ? slot.percent : (isTarget ? 1 : 100);
+      renderTargetOptionList();
       hideFigureOptions();
       $("slotModal").hidden = false;
       $("slotFigureInput").focus();
@@ -1211,16 +1792,70 @@
       $("slotModal").hidden = true;
       hideFigureOptions();
       editingSlotIndex = null;
+      editingSlotKind = "current";
+      editingTargetOptions = [];
+      editingTargetInputDirty = false;
+      $("targetOptionEditor").hidden = true;
     }
 
     function applySlotSetup() {
       if (editingSlotIndex === null) return;
       const fig = findFigureByInput($("slotFigureInput").value);
-      const grade = grades.includes($("slotGradeSelect").value) ? $("slotGradeSelect").value : "일반";
+      const grade = grades.includes($("slotGradeSelect").value) ? $("slotGradeSelect").value : "신화";
       const percent = clampInt($("slotPercentInput").value, 1, 100);
       $("slotFigureInput").value = fig.name;
-      slots[editingSlotIndex] = { figure: fig, grade, percent, locked: false, manual: true };
-      addLog(`${fig.name} ${grade}(${percent}%) 슬롯 세팅`);
+      expectationResultHtml = "";
+
+      if (editingSlotKind === "target") {
+        const options = editingTargetOptions.map(option => makeTargetOption(option.figure, option.grade, option.percent));
+        if ($("slotFigureInput").value.trim() && (!options.length || editingTargetInputDirty)) {
+          const typedOption = currentTargetOptionFromInputs();
+          if (!options.some(option => targetOptionKey(option) === targetOptionKey(typedOption))) options.push(typedOption);
+        }
+        if (!options.length) {
+          addLog("목표 후보를 1개 이상 넣어주세요.");
+          renderTargetOptionList();
+          return;
+        }
+        const limitedOptions = options.slice(0, 5);
+        const primary = limitedOptions[0];
+        targetSlots[editingSlotIndex] = {
+          figure: primary.figure,
+          grade: primary.grade,
+          gradeIndex: primary.gradeIndex,
+          percent: primary.percent,
+          options: limitedOptions,
+        };
+        slots[editingSlotIndex] = { empty: true, locked: false };
+        addLog(`목표 ${editingSlotIndex + 1} · ${describeTargetGroup(targetSlots[editingSlotIndex])}`);
+      } else {
+        const currentSlot = slots[editingSlotIndex];
+        const alreadyLocked = currentSlot && !currentSlot.empty && currentSlot.locked;
+        if (expectationMode && !alreadyLocked && getLockCount() >= 3) {
+          addLog("현재 피규어는 최대 3개까지 잠금 상태로 설정할 수 있습니다.");
+          render();
+          return;
+        }
+        slots[editingSlotIndex] = { figure: fig, grade, percent, locked: expectationMode ? true : false, manual: true };
+        if (expectationMode) targetSlots[editingSlotIndex] = null;
+        addLog(`${expectationMode ? "현재 " : ""}${fig.name} ${grade}(${percent}%) 슬롯 세팅`);
+      }
+      closeSlotSetup();
+      render();
+    }
+
+    function clearSlotSetup() {
+      if (editingSlotIndex === null) return;
+      expectationResultHtml = "";
+      if (editingSlotKind === "target") {
+        targetSlots[editingSlotIndex] = null;
+        if (expectationMode) slots[editingSlotIndex] = { empty: true, locked: false };
+        addLog(`슬롯 ${editingSlotIndex + 1} 비움`);
+      } else {
+        slots[editingSlotIndex] = { empty: true, locked: false };
+        if (expectationMode) targetSlots[editingSlotIndex] = null;
+        addLog(`슬롯 ${editingSlotIndex + 1} 비움`);
+      }
       closeSlotSetup();
       render();
     }
@@ -1239,6 +1874,7 @@
     function applyKeySetup() {
       keyBalance = Math.max(0, Math.floor(Number($("keyAmountInput").value || 0)));
       simulatorMode = true;
+      if (expectationMode) expectationResultHtml = "";
       addLog(`시뮬레이터 모드 · 열쇠 ${keyBalance}개 세팅`);
       closeKeySetup();
       render();
@@ -1257,6 +1893,7 @@
 
     function applyGaugeSetup() {
       gauge = Math.max(0, Math.floor(Number($("gaugeAmountInput").value || 0)));
+      if (expectationMode) expectationResultHtml = "";
       addLog(`신화 확정 게이지 ${gauge}/500 세팅`);
       closeGaugeSetup();
       render();
@@ -1265,6 +1902,10 @@
     function toggleLock(index) {
       if (!slots[index] || slots[index].empty) {
         openSlotSetup(index);
+        return;
+      }
+      if (expectationMode) {
+        openSlotSetup(index, "current");
         return;
       }
       if (!slots[index].locked && getLockCount() >= 3) {
@@ -1278,6 +1919,7 @@
 
     function applyGaugeInput() {
       gauge = Math.max(0, Math.floor(Number($("gaugeInput").value || 0)));
+      if (expectationMode) expectationResultHtml = "";
     }
 
     function pickFigureUniform(pool) {
@@ -1353,18 +1995,751 @@
       simulatorMode = false;
       keyBalance = 0;
       editingSlotIndex = null;
+      editingSlotKind = "current";
+      expectationMode = false;
+      expectationResultHtml = "";
+      expectationAnimating = false;
+      expectationPreviewSlots = [];
       $("slotModal").hidden = true;
       $("keyModal").hidden = true;
       $("gaugeModal").hidden = true;
+      $("expectResultModal").hidden = true;
+      $("expectModal").hidden = true;
       createEmptySlots();
+      createEmptyTargetSlots();
       render();
+    }
+
+    function gradeIndexOf(grade) {
+      return Math.max(0, grades.indexOf(grade));
+    }
+
+    function targetSpecsFromSlots() {
+      return targetSlots
+        .filter(Boolean)
+        .map(target => ({
+          options: normalizeTargetOptions(target).map(option => ({
+            figureIndex: Math.max(0, figures.indexOf(option.figure)),
+            gradeIndex: gradeIndexOf(option.grade),
+            percent: option.percent,
+          })),
+        }))
+        .filter(group => group.options.length);
+    }
+
+    function currentSimSlots() {
+      return slots.map(slot => {
+        if (!slot || slot.empty) return { empty: true, locked: false };
+        return {
+          empty: false,
+          figureIndex: Math.max(0, figures.indexOf(slot.figure)),
+          gradeIndex: gradeIndexOf(slot.grade),
+          percent: slot.percent,
+          locked: !!slot.locked,
+        };
+      });
+    }
+
+    function simRandomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function simRollGradeIndex() {
+      const r = simRandomInt(1, 100);
+      if (r <= 35) return 0;
+      if (r <= 65) return 1;
+      if (r <= 90) return 2;
+      if (r <= 99) return 3;
+      return 4;
+    }
+
+    function simPickFromPool(pool) {
+      const index = simRandomInt(0, pool.length - 1);
+      const value = pool[index];
+      pool.splice(index, 1);
+      return value;
+    }
+
+    function simSlotMatchesSpec(slot, spec) {
+      if (!slot || slot.empty) return false;
+      const options = spec.options || [spec];
+      return options.some(option => (
+        slot.figureIndex === option.figureIndex
+        && slot.gradeIndex >= option.gradeIndex
+        && slot.percent >= option.percent
+      ));
+    }
+
+    function simSlotMatches(slot, settings) {
+      if (settings.targetSpecs) return settings.targetSpecs.some(spec => simSlotMatchesSpec(slot, spec));
+      return slot && !slot.empty
+        && settings.targetNames.has(figures[slot.figureIndex].name)
+        && slot.gradeIndex >= settings.minGradeIndex
+        && slot.percent >= settings.minPercent;
+    }
+
+    function countSatisfiedSpecs(slotsToCheck, specs) {
+      if (!specs.length) return 0;
+      const usedSlots = Array(slotsToCheck.length).fill(false);
+
+      function search(specIndex) {
+        if (specIndex >= specs.length) return 0;
+        let best = search(specIndex + 1);
+        for (let slotIndex = 0; slotIndex < slotsToCheck.length; slotIndex++) {
+          if (usedSlots[slotIndex]) continue;
+          if (!simSlotMatchesSpec(slotsToCheck[slotIndex], specs[specIndex])) continue;
+          usedSlots[slotIndex] = true;
+          best = Math.max(best, 1 + search(specIndex + 1));
+          usedSlots[slotIndex] = false;
+        }
+        return best;
+      }
+
+      return search(0);
+    }
+
+    function lockedOnlySlots(slotsToCheck) {
+      return slotsToCheck.map(slot => (slot && !slot.empty && slot.locked) ? slot : { empty: true, locked: false });
+    }
+
+    function countSimMatches(state, settings) {
+      if (settings.targetSpecs) return countSatisfiedSpecs(state.slots, settings.targetSpecs);
+      const found = new Set();
+      state.slots.forEach(slot => {
+        if (simSlotMatches(slot, settings)) found.add(figures[slot.figureIndex].name);
+      });
+      return found.size;
+    }
+
+    function autoLockSimTargets(state, settings) {
+      if (settings.targetSpecs) {
+        const specs = settings.targetSpecs;
+        while (state.slots.filter(slot => slot && !slot.empty && slot.locked).length < 3) {
+          const baseScore = countSatisfiedSpecs(lockedOnlySlots(state.slots), specs);
+          let bestIndex = null;
+          let bestScore = baseScore;
+          let bestGrade = -1;
+          let bestPercent = -1;
+
+          state.slots.forEach((slot, index) => {
+            if (!slot || slot.empty || slot.locked) return;
+            if (!specs.some(spec => simSlotMatchesSpec(slot, spec))) return;
+            slot.locked = true;
+            const score = countSatisfiedSpecs(lockedOnlySlots(state.slots), specs);
+            slot.locked = false;
+            const betterTie = score === bestScore && (slot.gradeIndex > bestGrade || (slot.gradeIndex === bestGrade && slot.percent > bestPercent));
+            if (score > bestScore || betterTie) {
+              bestIndex = index;
+              bestScore = score;
+              bestGrade = slot.gradeIndex;
+              bestPercent = slot.percent;
+            }
+          });
+
+          if (bestIndex === null || bestScore <= baseScore) return;
+          state.slots[bestIndex].locked = true;
+        }
+        return;
+      }
+
+      const lockedNames = new Set(state.slots.filter(slot => slot && !slot.empty && slot.locked).map(slot => figures[slot.figureIndex].name));
+      for (const slot of state.slots) {
+        if (state.slots.filter(s => s && !s.empty && s.locked).length >= 3) return;
+        if (!simSlotMatches(slot, settings)) continue;
+        const name = figures[slot.figureIndex].name;
+        if (lockedNames.has(name)) continue;
+        slot.locked = true;
+        lockedNames.add(name);
+      }
+    }
+
+    function simCost(state) {
+      const lockCount = state.slots.filter(slot => slot && !slot.empty && slot.locked).length;
+      return keyCostByLock[lockCount] || 5;
+    }
+
+    function simulateUntil(settings, keyLimit, oneDrawOnly = false) {
+      const state = {
+        slots: settings.startSlots.map(slot => ({ ...slot })),
+        gauge: settings.startGauge,
+        spent: 0,
+        remaining: keyLimit,
+      };
+      autoLockSimTargets(state, settings);
+      if (countSimMatches(state, settings) >= settings.goalCount) return { success: true, spent: 0 };
+
+      while (state.remaining >= simCost(state)) {
+        const cost = simCost(state);
+        const isGuaranteed = state.gauge >= 500;
+        const unlockedIndexes = state.slots.map((slot, index) => (!slot.empty && slot.locked) ? null : index).filter(index => index !== null);
+        const lockedNames = new Set(state.slots.filter(slot => slot && !slot.empty && slot.locked).map(slot => figures[slot.figureIndex].name));
+        const pool = figures.map((_, index) => index).filter(index => !lockedNames.has(figures[index].name));
+
+        let guaranteedSlotIndex = null;
+        let guaranteedFigureIndex = null;
+        if (isGuaranteed && unlockedIndexes.length > 0) {
+          guaranteedSlotIndex = unlockedIndexes[simRandomInt(0, unlockedIndexes.length - 1)];
+          guaranteedFigureIndex = simPickFromPool(pool);
+        }
+
+        for (const index of unlockedIndexes) {
+          const figureIndex = index === guaranteedSlotIndex ? guaranteedFigureIndex : simPickFromPool(pool);
+          state.slots[index] = {
+            empty: false,
+            figureIndex,
+            gradeIndex: index === guaranteedSlotIndex ? 4 : simRollGradeIndex(),
+            percent: simRandomInt(1, 100),
+            locked: false,
+          };
+        }
+
+        state.remaining -= cost;
+        state.spent += cost;
+        state.gauge += cost;
+        if (isGuaranteed) state.gauge -= 500;
+
+        if (countSimMatches(state, settings) >= settings.goalCount) return { success: true, spent: state.spent };
+        autoLockSimTargets(state, settings);
+        if (oneDrawOnly) break;
+      }
+      return { success: false, spent: state.spent };
+    }
+
+    function formatPercent(value) {
+      return `${Number(value.toFixed(2))}%`;
+    }
+
+    function percentile(sortedValues, ratio) {
+      if (!sortedValues.length) return null;
+      const index = Math.min(sortedValues.length - 1, Math.ceil(sortedValues.length * ratio) - 1);
+      return sortedValues[index];
+    }
+
+    function randomPreviewSlot() {
+      return {
+        empty: false,
+        figure: sample(figures),
+        grade: rollGrade(),
+        percent: rollQualityPercent(),
+        locked: false,
+      };
+    }
+
+    function refreshDrawPreviewSlots() {
+      drawPreviewSlots = slots.map(slot => {
+        if (slot && !slot.empty && slot.locked) return slot;
+        return randomPreviewSlot();
+      });
+    }
+
+    function playDrawAnimation(duration = 620) {
+      if (drawAnimating) return Promise.resolve();
+      drawAnimating = true;
+      const startedAt = Date.now();
+
+      return new Promise(resolve => {
+        let timer = null;
+        const tick = () => {
+          refreshDrawPreviewSlots();
+          render();
+          if (Date.now() - startedAt < duration) return;
+          if (timer) clearInterval(timer);
+          drawAnimating = false;
+          drawPreviewSlots = [];
+          render();
+          resolve();
+        };
+        tick();
+        timer = setInterval(tick, 65);
+      });
+    }
+
+    function hasUnlockedMythicSlot() {
+      return slots.some(slot => slot && !slot.empty && !slot.locked && gradeIndexOf(slot.grade) >= gradeIndexOf("신화"));
+    }
+
+    function openMythicConfirm() {
+      $("mythicConfirmModal").hidden = false;
+    }
+
+    function closeMythicConfirm() {
+      $("mythicConfirmModal").hidden = true;
+    }
+
+    async function performDrawWithAnimation(skipMythicConfirm = false) {
+      if (drawAnimating) return;
+      const cost = getCost();
+      if (simulatorMode && keyBalance < cost) {
+        drawOnce(true);
+        return;
+      }
+      if (!skipMythicConfirm && hasUnlockedMythicSlot()) {
+        openMythicConfirm();
+        return;
+      }
+      closeMythicConfirm();
+      await playDrawAnimation();
+      drawOnce(true);
+    }
+
+    function refreshExpectationPreviewSlots() {
+      expectationPreviewSlots = slots.map(slot => {
+        if (slot && !slot.empty && slot.locked) return slot;
+        return randomPreviewSlot();
+      });
+    }
+
+    function playExpectationAnimation(duration = 850) {
+      if (expectationAnimating) return Promise.resolve();
+      expectationAnimating = true;
+      expectationResultHtml = `<div class="expect-placeholder"><div class="expect-summary">시뮬레이션 계산 중...</div></div>`;
+      const startedAt = Date.now();
+
+      return new Promise(resolve => {
+        let timer = null;
+        const tick = () => {
+          refreshExpectationPreviewSlots();
+          render();
+          if (Date.now() - startedAt < duration) return;
+          if (timer) clearInterval(timer);
+          expectationAnimating = false;
+          expectationPreviewSlots = [];
+          render();
+          resolve();
+        };
+        tick();
+        timer = setInterval(tick, 70);
+      });
+    }
+
+    function openExpectationResultModal(html) {
+      $("expectResultContent").innerHTML = html;
+      $("expectResultModal").hidden = false;
+    }
+
+    function closeExpectationResultModal() {
+      $("expectResultModal").hidden = true;
+    }
+
+    function yieldToUi() {
+      return new Promise(resolve => setTimeout(resolve, 0));
+    }
+
+    function progressHtml(done, total) {
+      return `
+        <div class="expect-placeholder">
+          <div class="expect-summary">시뮬레이션 계산 중... ${done}/${total}</div>
+        </div>
+      `;
+    }
+
+    function createExpectationWorker() {
+      const code = `
+        const keyCostByLock = { 0: 5, 1: 10, 2: 20, 3: 30 };
+        function simRandomInt(min, max) {
+          return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+        function simRollGradeIndex() {
+          const r = simRandomInt(1, 100);
+          if (r <= 35) return 0;
+          if (r <= 65) return 1;
+          if (r <= 90) return 2;
+          if (r <= 99) return 3;
+          return 4;
+        }
+        function simPickFromPool(pool) {
+          const index = simRandomInt(0, pool.length - 1);
+          const value = pool[index];
+          pool.splice(index, 1);
+          return value;
+        }
+        function simSlotMatchesSpec(slot, spec) {
+          if (!slot || slot.empty) return false;
+          const options = spec.options || [spec];
+          return options.some(option => (
+            slot.figureIndex === option.figureIndex
+            && slot.gradeIndex >= option.gradeIndex
+            && slot.percent >= option.percent
+          ));
+        }
+        function countSatisfiedSpecs(slotsToCheck, specs) {
+          if (!specs.length) return 0;
+          const usedSlots = Array(slotsToCheck.length).fill(false);
+          function search(specIndex) {
+            if (specIndex >= specs.length) return 0;
+            let best = search(specIndex + 1);
+            for (let slotIndex = 0; slotIndex < slotsToCheck.length; slotIndex++) {
+              if (usedSlots[slotIndex]) continue;
+              if (!simSlotMatchesSpec(slotsToCheck[slotIndex], specs[specIndex])) continue;
+              usedSlots[slotIndex] = true;
+              best = Math.max(best, 1 + search(specIndex + 1));
+              usedSlots[slotIndex] = false;
+            }
+            return best;
+          }
+          return search(0);
+        }
+        function lockedOnlySlots(slotsToCheck) {
+          return slotsToCheck.map(slot => (slot && !slot.empty && slot.locked) ? slot : { empty: true, locked: false });
+        }
+        function autoLockSimTargets(state, specs) {
+          while (state.slots.filter(slot => slot && !slot.empty && slot.locked).length < 3) {
+            const baseScore = countSatisfiedSpecs(lockedOnlySlots(state.slots), specs);
+            let bestIndex = null;
+            let bestScore = baseScore;
+            let bestGrade = -1;
+            let bestPercent = -1;
+            state.slots.forEach((slot, index) => {
+              if (!slot || slot.empty || slot.locked) return;
+              if (!specs.some(spec => simSlotMatchesSpec(slot, spec))) return;
+              slot.locked = true;
+              const score = countSatisfiedSpecs(lockedOnlySlots(state.slots), specs);
+              slot.locked = false;
+              const betterTie = score === bestScore && (slot.gradeIndex > bestGrade || (slot.gradeIndex === bestGrade && slot.percent > bestPercent));
+              if (score > bestScore || betterTie) {
+                bestIndex = index;
+                bestScore = score;
+                bestGrade = slot.gradeIndex;
+                bestPercent = slot.percent;
+              }
+            });
+            if (bestIndex === null || bestScore <= baseScore) return;
+            state.slots[bestIndex].locked = true;
+          }
+        }
+        function simCost(state) {
+          const lockCount = state.slots.filter(slot => slot && !slot.empty && slot.locked).length;
+          return keyCostByLock[lockCount] || 5;
+        }
+        function simulateUntil(payload) {
+          const state = {
+            slots: payload.startSlots.map(slot => ({ ...slot })),
+            gauge: payload.startGauge,
+            spent: 0,
+            remaining: payload.expectationBudget,
+          };
+          autoLockSimTargets(state, payload.targetSpecs);
+          if (countSatisfiedSpecs(state.slots, payload.targetSpecs) >= payload.goalCount) return { success: true, spent: 0 };
+          while (state.remaining >= simCost(state)) {
+            const cost = simCost(state);
+            const isGuaranteed = state.gauge >= 500;
+            const unlockedIndexes = state.slots.map((slot, index) => (!slot.empty && slot.locked) ? null : index).filter(index => index !== null);
+            const lockedNames = new Set(state.slots.filter(slot => slot && !slot.empty && slot.locked).map(slot => payload.figureNames[slot.figureIndex]));
+            const pool = payload.figureNames.map((_, index) => index).filter(index => !lockedNames.has(payload.figureNames[index]));
+            let guaranteedSlotIndex = null;
+            let guaranteedFigureIndex = null;
+            if (isGuaranteed && unlockedIndexes.length > 0) {
+              guaranteedSlotIndex = unlockedIndexes[simRandomInt(0, unlockedIndexes.length - 1)];
+              guaranteedFigureIndex = simPickFromPool(pool);
+            }
+            for (const index of unlockedIndexes) {
+              const figureIndex = index === guaranteedSlotIndex ? guaranteedFigureIndex : simPickFromPool(pool);
+              state.slots[index] = {
+                empty: false,
+                figureIndex,
+                gradeIndex: index === guaranteedSlotIndex ? 4 : simRollGradeIndex(),
+                percent: simRandomInt(1, 100),
+                locked: false,
+              };
+            }
+            state.remaining -= cost;
+            state.spent += cost;
+            state.gauge += cost;
+            if (isGuaranteed) state.gauge -= 500;
+            if (countSatisfiedSpecs(state.slots, payload.targetSpecs) >= payload.goalCount) return { success: true, spent: state.spent };
+            autoLockSimTargets(state, payload.targetSpecs);
+          }
+          return { success: false, spent: state.spent };
+        }
+        self.onmessage = event => {
+          const payload = event.data;
+          const startedAt = Date.now();
+          let oneDrawSuccess = 0;
+          let budgetSuccess = 0;
+          let expectationSuccess = 0;
+          let completedRuns = 0;
+          const successKeys = [];
+          for (let i = 0; i < payload.runCount; i++) {
+            const result = simulateUntil(payload);
+            completedRuns = i + 1;
+            if (result.success) {
+              expectationSuccess += 1;
+              successKeys.push(result.spent);
+              if (result.spent <= payload.firstDrawBudget) oneDrawSuccess += 1;
+              if (payload.simulatorMode && result.spent <= payload.keyBudget) budgetSuccess += 1;
+            }
+            if (completedRuns % payload.progressEvery === 0) {
+              self.postMessage({ type: "progress", completedRuns });
+              if (Date.now() - startedAt > payload.maxMs && completedRuns >= payload.minRuns) break;
+            }
+          }
+          self.postMessage({
+            type: "done",
+            completedRuns,
+            oneDrawSuccess,
+            budgetSuccess,
+            expectationSuccess,
+            successKeys,
+            timedOut: completedRuns < payload.runCount,
+          });
+        };
+      `;
+      const blob = new Blob([code], { type: "application/javascript" });
+      const url = URL.createObjectURL(blob);
+      const worker = new Worker(url);
+      worker._url = url;
+      return worker;
+    }
+
+    function runExpectationWorker(payload, onProgress) {
+      return new Promise((resolve, reject) => {
+        const worker = createExpectationWorker();
+        worker.onmessage = event => {
+          if (event.data.type === "progress") onProgress(event.data.completedRuns);
+          if (event.data.type === "done") {
+            worker.terminate();
+            URL.revokeObjectURL(worker._url);
+            resolve(event.data);
+          }
+        };
+        worker.onerror = error => {
+          worker.terminate();
+          URL.revokeObjectURL(worker._url);
+          reject(error);
+        };
+        worker.postMessage(payload);
+      });
+    }
+
+    function openExpectationMode() {
+      expectationMode = true;
+      expectationResultHtml = "";
+      $("expectModal").hidden = true;
+      $("expectResultModal").hidden = true;
+      hideSimFigureOptions();
+      addLog("기대값 모드로 전환했습니다.");
+      render();
+    }
+
+    function closeExpectationMode() {
+      $("expectModal").hidden = true;
+      $("expectResultModal").hidden = true;
+      hideSimFigureOptions();
+      if (!expectationMode) return;
+      expectationMode = false;
+      expectationResultHtml = "";
+      expectationAnimating = false;
+      expectationPreviewSlots = [];
+      render();
+    }
+
+    function toggleExpectationMode() {
+      if (expectationMode) closeExpectationMode();
+      else openExpectationMode();
+    }
+
+    async function runExpectationModeSimulation() {
+      if (expectationAnimating) return;
+      let animationTimer = null;
+
+      try {
+        applyGaugeInput();
+        const targetSpecs = targetSpecsFromSlots();
+        if (!targetSpecs.length) {
+          expectationResultHtml = `
+            <div class="expect-placeholder">
+              <div class="sim-result-warn">목표 칸이 없어서 이미 완료 상태입니다. 목표 칸을 하나 이상 넣으면 기대값을 계산합니다.</div>
+            </div>
+          `;
+          render();
+          openExpectationResultModal(expectationResultHtml);
+          return;
+        }
+
+        const startSlots = currentSimSlots();
+        const settings = {
+          targetSpecs,
+          goalCount: targetSpecs.length,
+          startSlots,
+          startGauge: gauge,
+        };
+        const keyBudget = simulatorMode ? keyBalance : 0;
+        const expectationBudget = Math.max(keyBudget, expectationKeyCap);
+        const firstDrawBudget = simCost({ slots: startSlots });
+
+        await playExpectationAnimation();
+        expectationAnimating = true;
+        expectationResultHtml = progressHtml(0, expectationRunCount);
+        refreshExpectationPreviewSlots();
+        render();
+        animationTimer = setInterval(() => {
+          refreshExpectationPreviewSlots();
+          render();
+        }, 70);
+        const workerResult = await runExpectationWorker({
+          figureNames: figures.map(figure => figure.name),
+          targetSpecs,
+          goalCount: settings.goalCount,
+          startSlots,
+          startGauge: gauge,
+          keyBudget,
+          expectationBudget,
+          firstDrawBudget,
+          simulatorMode,
+          runCount: expectationRunCount,
+          progressEvery: Math.max(1, expectationBatchSize),
+          maxMs: expectationMaxMs,
+          minRuns: 20,
+        }, (done) => {
+          expectationResultHtml = progressHtml(done, expectationRunCount);
+        });
+        clearInterval(animationTimer);
+        animationTimer = null;
+
+        const {
+          completedRuns,
+          oneDrawSuccess,
+          budgetSuccess,
+          expectationSuccess,
+          successKeys,
+        } = workerResult;
+
+        successKeys.sort((a, b) => a - b);
+        const sampleCount = Math.max(1, completedRuns);
+        const averageKeys = successKeys.length ? successKeys.reduce((sum, value) => sum + value, 0) / successKeys.length : null;
+        const medianKeys = percentile(successKeys, 0.5);
+        const p90Keys = percentile(successKeys, 0.9);
+        const alreadyMatches = countSatisfiedSpecs(startSlots, targetSpecs);
+        const budgetRow = simulatorMode
+          ? `<div class="sim-result-row"><span>설정 열쇠 내 성공률</span><b>${formatPercent((budgetSuccess / sampleCount) * 100)}</b></div>`
+          : `<div class="sim-result-row"><span>설정 열쇠</span><b>미설정</b></div>`;
+        const timeLimitWarning = completedRuns < expectationRunCount
+          ? `<div class="sim-result-warn">조건이 무거워서 ${completedRuns}회 표본까지만 계산했습니다. 결과는 현재 표본 기준입니다.</div>`
+          : "";
+        const rareWarning = expectationSuccess < sampleCount * 0.05
+          ? `<div class="sim-result-warn">성공 표본이 적습니다. 목표가 매우 빡센 상태라 평균 필요 열쇠가 흔들릴 수 있습니다.</div>`
+          : "";
+
+        expectationResultHtml = `
+          <div class="expect-result">
+            <div class="sim-result-row"><span>목표 중 이미 만족</span><b>${alreadyMatches}/${settings.goalCount}</b></div>
+            <div class="sim-result-row"><span>한 번 눌렀을 때 성공</span><b>${formatPercent((oneDrawSuccess / sampleCount) * 100)}</b></div>
+            ${budgetRow}
+            <div class="sim-result-row"><span>평균 필요 열쇠</span><b>${averageKeys === null ? "-" : Math.round(averageKeys)}</b></div>
+            <div class="sim-result-row"><span>중앙값 필요 열쇠</span><b>${medianKeys === null ? "-" : medianKeys}</b></div>
+            <div class="sim-result-row"><span>90% 기준 필요 열쇠</span><b>${p90Keys === null ? "-" : p90Keys}</b></div>
+            <div class="sim-result-row"><span>성공 표본</span><b>${expectationSuccess}/${completedRuns}</b></div>
+            <div class="sim-result-row"><span>시작 조건</span><b>${simulatorMode ? `열쇠 ${keyBudget}` : "열쇠 미설정"} · 게이지 ${gauge}/500</b></div>
+            <div class="expect-summary">현재 칸은 잠긴 상태로 시작하고, 목표 칸은 어느 빈 슬롯에 뜨든 최대 3개까지 자동 잠금합니다.</div>
+            ${timeLimitWarning}
+            ${rareWarning}
+          </div>
+        `;
+      } catch (error) {
+        expectationResultHtml = `
+          <div class="expect-placeholder">
+            <div class="sim-result-warn">계산 중 오류가 발생했습니다. 설정을 조금 낮춰 다시 시도해주세요.</div>
+          </div>
+        `;
+      } finally {
+        if (animationTimer) clearInterval(animationTimer);
+        expectationAnimating = false;
+        expectationPreviewSlots = [];
+        render();
+        openExpectationResultModal(expectationResultHtml);
+      }
+    }
+
+    function runExpectationSimulation() {
+      runExpectationModeSimulation();
+    }
+
+    function describeSlot(slot, target = false) {
+      if (!slot || slot.empty) return target ? "아무거나 상관없음" : "현재 없음";
+      const suffix = target ? " 이상" : "";
+      const percentSuffix = target ? "% 이상" : "%";
+      return `${slot.figure.name} ${slot.grade}${suffix} (${slot.percent}${percentSuffix})`;
+    }
+
+    function renderExpectationCards() {
+      $("resultCards").innerHTML = slots.map((slot, i) => {
+        const target = targetSlots[i];
+        if (slot && !slot.empty) {
+          const cls = gradeClass[slot.grade];
+          return `
+            <div class="card ${cls} locked expect-slot-card" onclick="openSlotSetup(${i}, 'current')">
+              <div class="mini-icon">${figureVisual(slot.figure)}</div>
+              <div>
+                <div class="card-title"><span class="expect-badge">현재</span>${slot.figure.name} <span class="grade-name">${slot.grade}</span> <span class="grade-percent">(${slot.percent}%)</span></div>
+                <div class="effect-line">${buildEffect(slot)}</div>
+              </div>
+              <div class="expect-choice-actions">
+                <button type="button" onclick="openSlotSetup(${i}, 'current'); event.stopPropagation();">현재</button>
+                <button type="button" onclick="openSlotSetup(${i}, 'target'); event.stopPropagation();">목표</button>
+              </div>
+            </div>
+          `;
+        }
+
+        if (target && !target.empty) {
+          const options = normalizeTargetOptions(target);
+          const primary = primaryTargetOption(target);
+          const cls = targetGroupClass(target);
+          return `
+            <div class="card ${cls} target expect-slot-card" onclick="openSlotSetup(${i}, 'target')">
+              <div class="mini-icon">${figureVisual(primary.figure)}</div>
+              <div>
+                <div class="card-title"><span class="expect-badge">목표</span>${escapeHtml(describeTargetGroup(target))}</div>
+                <div class="effect-line">후보 ${options.length}개 중 하나가 어느 빈 슬롯에 뜨든 목표 달성입니다.</div>
+              </div>
+              <div class="expect-choice-actions">
+                <button type="button" onclick="openSlotSetup(${i}, 'current'); event.stopPropagation();">현재</button>
+                <button type="button" class="primary" onclick="openSlotSetup(${i}, 'target'); event.stopPropagation();">목표</button>
+              </div>
+            </div>
+          `;
+        }
+
+        return `
+          <div class="card empty expect-slot-card" onclick="openSlotSetup(${i}, 'current')">
+            <div class="mini-icon">?</div>
+            <div>
+              <div class="card-title">상관없음</div>
+              <div class="effect-line">현재 고정 또는 목표를 선택할 수 있습니다.</div>
+            </div>
+            <div class="expect-choice-actions">
+              <button type="button" onclick="openSlotSetup(${i}, 'current'); event.stopPropagation();">현재</button>
+              <button type="button" class="primary" onclick="openSlotSetup(${i}, 'target'); event.stopPropagation();">목표</button>
+            </div>
+          </div>
+        `;
+      }).join("");
     }
 
     function renderStage() {
       $("slotStage").innerHTML = slots.map((slot, i) => {
+        if (expectationMode && expectationAnimating && (!slot || slot.empty || !slot.locked)) {
+          const preview = expectationPreviewSlots[i] || randomPreviewSlot();
+          return `
+            <div class="slot-stand ${gradeClass[preview.grade]} rolling" data-index="${i}" title="시뮬레이션 중">
+              <div class="figure-icon">${figureVisual(preview.figure)}</div>
+              <div class="pedestal"></div>
+            </div>
+          `;
+        }
+        const target = expectationMode ? targetSlots[i] : null;
+        if (target && !target.empty && (!slot || slot.empty)) {
+          const primary = primaryTargetOption(target);
+          return `
+            <div class="slot-stand ${targetGroupClass(target)} target" data-index="${i}" onclick="openSlotSetup(${i}, 'target')" title="목표 ${escapeHtml(describeTargetGroup(target))}">
+              <div class="figure-icon">${figureVisual(primary.figure)}</div>
+              <div class="pedestal"></div>
+            </div>
+          `;
+        }
         if (slot.empty) {
           return `
-            <div class="slot-stand empty" data-index="${i}" onclick="openSlotSetup(${i})" title="빈 슬롯 세팅">
+            <div class="slot-stand empty" data-index="${i}" onclick="openSlotSetup(${i}, 'current')" title="빈 슬롯 세팅">
               <div class="figure-icon empty-figure">?</div>
               <div class="pedestal"></div>
             </div>
@@ -1380,6 +2755,10 @@
     }
 
     function renderCards() {
+      if (expectationMode) {
+        renderExpectationCards();
+        return;
+      }
       $("resultCards").innerHTML = slots.map((slot, i) => {
         if (slot.empty) {
           return `
@@ -1414,14 +2793,21 @@
       const naturalMythics = Math.max(0, gradeStats["신화"] - guaranteedCount);
       const legendPlus = gradeStats["전설"] + gradeStats["신화"];
       const mythicRate = totalFigures ? `${Number(((gradeStats["신화"] / totalFigures) * 100).toFixed(2))}%` : "0%";
-      const cannotDraw = simulatorMode && keyBalance < cost;
+      const cannotDraw = expectationAnimating || (!expectationMode && simulatorMode && keyBalance < cost);
+      document.body.classList.toggle("expect-mode", expectationMode);
+      $("helpBtn").innerHTML = expectationMode ? "돌아<br>가기" : "기대값<br>모드";
+      $("helpBtn").title = expectationMode ? "뽑기 모드로 돌아가기" : "기대값 모드";
+      $("drawBtn").innerHTML = expectationMode
+        ? (expectationAnimating ? `계산중<span class="cost">ROLL</span>` : `기대값 계산<span class="cost">${expectationRunCount}회</span>`)
+        : `뽑기<span class="cost">🔑 <span id="drawCost">${cost}</span></span>`;
       $("gaugeInput").value = gauge;
       $("usedKeysTop").textContent = simulatorMode ? keyBalance : usedKeys;
       $("usedKeysStat").textContent = usedKeys;
       $("totalFigureCount").textContent = totalFigures;
       $("lockCount").textContent = lockCount;
       $("nextCost").textContent = cost;
-      $("drawCost").textContent = cost;
+      const drawCostEl = $("drawCost");
+      if (drawCostEl) drawCostEl.textContent = cost;
       $("drawCount").textContent = drawCount;
       $("normalCount").textContent = gradeStats["일반"];
       $("rareCount").textContent = gradeStats["희귀"];
@@ -1434,7 +2820,11 @@
       $("mythicRate").textContent = mythicRate;
       $("pityText").textContent = `${gauge}/500`;
       $("pityText").className = gauge >= 500 ? "pity-count pity-ready" : "pity-count";
-      $("log").innerHTML = logs.length ? logs.map(l => `<div>${l}</div>`).join("") : "아직 뽑기 기록이 없습니다.";
+      $("statsTitle").textContent = expectationMode ? "기대값 결과" : "뽑기 통계";
+      $("statGrid").hidden = expectationMode;
+      $("log").innerHTML = expectationMode
+        ? (expectationResultHtml || `<div class="expect-placeholder"><div class="expect-summary">5칸에 현재, 목표, 상관없음을 넣은 뒤 기대값 계산을 누르세요. 상관없음 칸은 계산에서 제외됩니다.</div></div>`)
+        : (logs.length ? logs.map(l => `<div>${l}</div>`).join("") : "아직 뽑기 기록이 없습니다.");
       $("keyBadge").classList.toggle("simulator-mode", simulatorMode);
       $("keyBadge").title = simulatorMode ? "남은 열쇠 세팅" : "열쇠 세팅";
       $("drawBtn").disabled = cannotDraw;
@@ -1442,45 +2832,100 @@
       renderCards();
     }
 
-    $("drawBtn").addEventListener("click", () => drawOnce(true));
+    $("drawBtn").addEventListener("click", () => {
+      if (expectationMode) runExpectationModeSimulation();
+      else drawOnce(true);
+    });
     $("resetBtn").addEventListener("click", resetAll);
     $("gaugeInput").addEventListener("change", () => { applyGaugeInput(); render(); });
     $("keyBadge").addEventListener("click", openKeySetup);
     $("pityBox").addEventListener("click", openGaugeSetup);
     $("slotCancelBtn").addEventListener("click", closeSlotSetup);
     $("slotApplyBtn").addEventListener("click", applySlotSetup);
+    $("slotClearBtn").addEventListener("click", clearSlotSetup);
+    $("targetOptionAddBtn").addEventListener("click", addTargetOptionFromModal);
     $("keyCancelBtn").addEventListener("click", closeKeySetup);
     $("keyApplyBtn").addEventListener("click", applyKeySetup);
     $("gaugeCancelBtn").addEventListener("click", closeGaugeSetup);
     $("gaugeApplyBtn").addEventListener("click", applyGaugeSetup);
+    $("expectResultCloseBtn").addEventListener("click", closeExpectationResultModal);
     $("figureListToggle").addEventListener("click", openAllFigureOptions);
     $("slotFigureInput").addEventListener("focus", showFigureOptions);
-    $("slotFigureInput").addEventListener("input", () => showFigureOptions());
+    $("slotFigureInput").addEventListener("input", () => {
+      if (editingSlotKind === "target") editingTargetInputDirty = true;
+      showFigureOptions();
+    });
+    $("slotGradeSelect").addEventListener("change", () => { if (editingSlotKind === "target") editingTargetInputDirty = true; });
+    $("slotPercentInput").addEventListener("input", () => { if (editingSlotKind === "target") editingTargetInputDirty = true; });
     $("slotFigureOptions").addEventListener("click", (event) => {
       const option = event.target.closest(".figure-option");
       if (!option) return;
       const name = option.dataset.name;
       if (!figures.some(fig => fig.name === name)) return;
       $("slotFigureInput").value = name;
+      if (editingSlotKind === "target") editingTargetInputDirty = true;
       hideFigureOptions();
       $("slotGradeSelect").focus();
     });
     $("slotModal").addEventListener("click", (event) => { if (event.target === $("slotModal")) closeSlotSetup(); });
     $("keyModal").addEventListener("click", (event) => { if (event.target === $("keyModal")) closeKeySetup(); });
     $("gaugeModal").addEventListener("click", (event) => { if (event.target === $("gaugeModal")) closeGaugeSetup(); });
-    $("slotFigureInput").addEventListener("keydown", (event) => { if (event.key === "Enter") applySlotSetup(); });
-    $("slotPercentInput").addEventListener("keydown", (event) => { if (event.key === "Enter") applySlotSetup(); });
+    $("expectResultModal").addEventListener("click", (event) => { if (event.target === $("expectResultModal")) closeExpectationResultModal(); });
+    $("targetOptionList").addEventListener("click", (event) => {
+      const chip = event.target.closest(".target-chip");
+      if (!chip) return;
+      const index = Number(chip.dataset.index);
+      if (!Number.isInteger(index)) return;
+      editingTargetOptions.splice(index, 1);
+      renderTargetOptionList();
+    });
+    $("slotFigureInput").addEventListener("keydown", (event) => {
+      if (event.key !== "Enter") return;
+      if (editingSlotKind === "target") addTargetOptionFromModal();
+      else applySlotSetup();
+    });
+    $("slotPercentInput").addEventListener("keydown", (event) => {
+      if (event.key !== "Enter") return;
+      if (editingSlotKind === "target") addTargetOptionFromModal();
+      else applySlotSetup();
+    });
     $("keyAmountInput").addEventListener("keydown", (event) => { if (event.key === "Enter") applyKeySetup(); });
     $("gaugeAmountInput").addEventListener("keydown", (event) => { if (event.key === "Enter") applyGaugeSetup(); });
+    $("simFigureListToggle").addEventListener("click", () => showSimFigureOptions(true));
+    $("simFigureInput").addEventListener("focus", () => showSimFigureOptions(false));
+    $("simFigureInput").addEventListener("input", () => showSimFigureOptions(false));
+    $("simFigureInput").addEventListener("keydown", (event) => { if (event.key === "Enter") addSimTargetFromInput(); });
+    $("simFigureAddBtn").addEventListener("click", addSimTargetFromInput);
+    $("simFigureOptions").addEventListener("click", (event) => {
+      const option = event.target.closest(".figure-option");
+      if (!option) return;
+      const name = option.dataset.name;
+      if (!figures.some(fig => fig.name === name)) return;
+      $("simFigureInput").value = name;
+      hideSimFigureOptions();
+      $("simFigureAddBtn").focus();
+    });
+    $("simTargetList").addEventListener("click", (event) => {
+      const chip = event.target.closest(".target-chip");
+      if (!chip) return;
+      simTargets.delete(chip.dataset.name);
+      renderSimTargetList();
+    });
+    $("expectCloseBtn").addEventListener("click", closeExpectationMode);
+    $("expectRunBtn").addEventListener("click", runExpectationSimulation);
+    $("expectModal").addEventListener("click", (event) => { if (event.target === $("expectModal")) closeExpectationMode(); });
     document.addEventListener("keydown", (event) => {
       if (event.key !== "Escape") return;
+      const hadOpenModal = !$("slotModal").hidden || !$("keyModal").hidden || !$("gaugeModal").hidden || !$("expectModal").hidden || !$("expectResultModal").hidden;
       closeSlotSetup();
       closeKeySetup();
       closeGaugeSetup();
+      closeExpectationResultModal();
+      $("expectModal").hidden = true;
+      hideSimFigureOptions();
+      if (!hadOpenModal) closeExpectationMode();
     });
-    $("helpBtn").addEventListener("click", () => {
-      alert("확률 규칙\n- 피규어 30종은 동일 확률로 등장\n- 5칸은 중복 없이 등장\n- 등급 확률: 일반 35%, 희귀 30%, 영웅 25%, 전설 9%, 신화 1%\n- 등급 내 퍼센트: 1~100%, 각 값 동일 확률\n- 수치 계산: 최소값 + (최대값 - 최소값) × 등급퍼센트 / 100\n\n세팅\n- 빈 슬롯을 누르면 피규어, 등급, 퍼센트를 직접 세팅할 수 있습니다.\n- 열쇠 배너를 누르면 보유 열쇠를 정하고 시뮬레이터 모드로 전환합니다.\n- 신화 확정 게이지 박스를 누르면 현재 게이지를 직접 세팅할 수 있습니다.\n- 시뮬레이터 모드에서는 뽑기 비용이 보유 열쇠에서 차감되고, 열쇠가 부족하면 뽑기할 수 없습니다.\n\n예시\n워터블롭 전설 40% = 9 + (12 - 9) × 0.4 = 10.2%\n산타블롭 신화 18% = 160 + (200 - 160) × 0.18 = 167.2 → 167 코인");
-    });
+    $("helpBtn").addEventListener("click", toggleExpectationMode);
 
     initSetupControls();
     resetAll();
