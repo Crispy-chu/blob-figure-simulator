@@ -1,0 +1,1489 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>블롭 피규어 뽑기 시뮬레이터 v6</title>
+  <style>
+    :root {
+      --bg: #111725;
+      --panel: #20283a;
+      --line: #44516d;
+      --text: #f7f8fc;
+      --muted: #b9c1d5;
+      --yellow: #ffd83d;
+      --green: #00d94d;
+      --normal: #D1CFCB;
+      --rare: #88CEEE;
+      --hero: #CEA7F6;
+      --legend: #F3CC66;
+      --mythic: #FDA742;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Pretendard", "SUIT", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", sans-serif;
+      letter-spacing: 0;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255, 216, 61, 0.18), transparent 34%),
+        linear-gradient(180deg, #0b1020 0%, #151c2d 48%, #0d111c 100%);
+      display: flex;
+      justify-content: center;
+      padding: 22px 12px;
+    }
+    .app { width: min(430px, 100%); }
+    .topbar { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; }
+    h1 { margin: 0; font-size: 22px; letter-spacing: 0; }
+    .subtitle { margin: 5px 0 0; color: var(--muted); font-size: 12px; line-height: 1.35; }
+    button { font-family: inherit; }
+    .small-btn {
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 9px 11px;
+      font-weight: 900;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .machine {
+      position: relative;
+      min-height: 245px;
+      border: 2px solid rgba(255,255,255,0.12);
+      border-radius: 22px 22px 8px 8px;
+      overflow: hidden;
+      background:
+        linear-gradient(rgba(0,0,0,.36), rgba(0,0,0,.30)),
+        radial-gradient(circle at 20% 22%, rgba(255,255,255,.12), transparent 16%),
+        radial-gradient(circle at 80% 15%, rgba(255,255,255,.10), transparent 18%),
+        linear-gradient(135deg, #1b2b3f 0%, #111827 100%);
+      box-shadow: 0 16px 50px rgba(0,0,0,.38);
+    }
+    .spotlight {
+      position: absolute;
+      width: 130px;
+      height: 190px;
+      background: radial-gradient(ellipse at top, rgba(255,245,190,.42), rgba(255,245,190,.08) 42%, transparent 72%);
+      transform-origin: top;
+      opacity: .72;
+      pointer-events: none;
+    }
+    .spotlight.s1 { left: -18px; top: 56px; transform: rotate(20deg); }
+    .spotlight.s2 { right: -18px; top: 56px; transform: rotate(-20deg); }
+    .spotlight.s3 { left: 18px; top: -24px; transform: rotate(-32deg); }
+    .spotlight.s4 { right: 18px; top: -24px; transform: rotate(32deg); }
+    .stage {
+      position: absolute;
+      left: 28px;
+      right: 28px;
+      bottom: 16px;
+      height: 68px;
+      border-radius: 18px 18px 10px 10px;
+      background: linear-gradient(180deg, #59657b, #2e3748 62%, #1f2736);
+      border: 2px solid #728097;
+      box-shadow: inset 0 10px 20px rgba(255,255,255,.1), 0 -4px 0 rgba(0,0,0,.35);
+    }
+    .slots { position: relative; z-index: 2; height: 218px; }
+    .slot-stand {
+      position: absolute;
+      width: 78px;
+      height: 88px;
+      transform: translateX(-50%);
+      cursor: pointer;
+      user-select: none;
+      transition: transform .12s ease;
+    }
+    .slot-stand:hover { transform: translateX(-50%) translateY(-2px); }
+    .slot-stand.empty { cursor: default; opacity: .72; }
+    .slot-stand.empty:hover { transform: translateX(-50%); }
+    .empty-figure {
+      background: linear-gradient(180deg, #323b4f, #171d2b) !important;
+      border-style: dashed !important;
+      color: rgba(255,255,255,.55);
+      font-size: 24px;
+    }
+    .slot-stand[data-index="0"] { left: 28%; top: 12px; }
+    .slot-stand[data-index="1"] { left: 72%; top: 12px; }
+    .slot-stand[data-index="2"] { left: 22%; top: 103px; }
+    .slot-stand[data-index="3"] { left: 50%; top: 95px; }
+    .slot-stand[data-index="4"] { left: 78%; top: 103px; }
+    .pedestal {
+      position: absolute;
+      left: 7px;
+      right: 7px;
+      bottom: 0;
+      height: 25px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, #59627a, #1d2434);
+      border: 2px solid rgba(255,255,255,.28);
+      box-shadow: 0 5px 0 rgba(0,0,0,.35);
+    }
+    .slot-stand.legend .pedestal { box-shadow: 0 5px 0 rgba(0,0,0,.35), 0 0 18px rgba(255,214,74,.58); }
+    .slot-stand.mythic .pedestal { box-shadow: 0 5px 0 rgba(0,0,0,.35), 0 0 18px rgba(255,163,58,.58); }
+    .figure-icon {
+      position: absolute;
+      left: 50%;
+      bottom: 17px;
+      width: 58px;
+      height: 68px;
+      transform: translateX(-50%);
+      border-radius: 46% 46% 42% 42%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 29px;
+      font-weight: 900;
+      border: 3px solid rgba(255,255,255,.82);
+      box-shadow: inset 0 -8px 0 rgba(0,0,0,.11), 0 0 18px rgba(255,255,255,.14);
+      overflow: hidden;
+      text-shadow: 0 2px 1px rgba(0,0,0,.22);
+    }
+    .figure-icon img, .mini-icon img {
+      width: 100%; height: 100%; object-fit: contain; display: block; position: relative; z-index: 2;
+    }
+    .fallback-emoji {
+      width: 100%; height: 100%; display: none; align-items: center; justify-content: center; position: absolute; inset: 0; z-index: 1;
+    }
+    .slot-stand.locked .figure-icon::after {
+      content: "🔒";
+      position: absolute;
+      right: -13px;
+      top: -12px;
+      font-size: 19px;
+      filter: drop-shadow(0 2px 1px rgba(0,0,0,.5));
+      z-index: 3;
+    }
+    .key-badge {
+      margin: -11px auto 12px;
+      position: relative;
+      z-index: 4;
+      width: 188px;
+      height: 44px;
+      background: linear-gradient(180deg, #424a58, #252b36);
+      border: 3px solid #111723;
+      border-radius: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 3px 0 rgba(255,255,255,.15) inset, 0 5px 0 rgba(0,0,0,.45);
+      font-size: 24px;
+      font-weight: 1000;
+    }
+    .key-badge .key { color: var(--yellow); font-size: 25px; }
+    .controls-panel {
+      background: rgba(9, 13, 24, 0.54);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 16px;
+      padding: 12px;
+      margin-bottom: 12px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .control-box {
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.09);
+      border-radius: 13px;
+      padding: 10px;
+    }
+    .control-label { color: var(--muted); font-size: 12px; font-weight: 800; margin-bottom: 6px; }
+    .control-value { font-size: 18px; font-weight: 1000; }
+    .control-box input {
+      width: 100%; border: 0; border-radius: 10px; padding: 8px 9px;
+      background: rgba(0,0,0,.32); color: var(--text); font-size: 16px; font-weight: 900; outline: none;
+    }
+    .results { display: flex; flex-direction: column; gap: 8px; }
+    .card {
+      position: relative;
+      min-height: 72px;
+      border-radius: 11px;
+      border: 3px solid rgba(0,0,0,.33);
+      display: grid;
+      grid-template-columns: 54px 1fr 34px;
+      gap: 8px;
+      align-items: center;
+      padding: 8px;
+      color: #252220;
+      box-shadow: inset 0 3px 0 rgba(255,255,255,.35), 0 2px 0 rgba(0,0,0,.36);
+    }
+    .card.normal { background: linear-gradient(180deg, #E7E5E1, var(--normal)); }
+    .card.rare { background: linear-gradient(180deg, #BDE8FA, var(--rare)); }
+    .card.hero { background: linear-gradient(180deg, #E4CDFB, var(--hero)); }
+    .card.legend { background: linear-gradient(180deg, #FFE38F, var(--legend)); }
+    .card.mythic { background: linear-gradient(180deg, #FFC46E, var(--mythic)); }
+    .card.empty {
+      background: linear-gradient(180deg, #384259, #242c3d);
+      color: rgba(255,255,255,.78);
+      border-color: rgba(255,255,255,.12);
+      box-shadow: inset 0 3px 0 rgba(255,255,255,.08), 0 2px 0 rgba(0,0,0,.36);
+    }
+    .card.empty .card-title,
+    .card.empty .effect-line { color: rgba(255,255,255,.78); }
+    .card.empty .mini-icon {
+      background: rgba(0,0,0,.25);
+      border-color: rgba(255,255,255,.16);
+      color: rgba(255,255,255,.55);
+    }
+    .mini-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      background: rgba(255,255,255,.55);
+      border: 3px solid rgba(0,0,0,.22);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 27px;
+      box-shadow: inset 0 -4px 0 rgba(0,0,0,.08);
+      overflow: hidden;
+      position: relative;
+    }
+    .slot-stand.normal .figure-icon, .card.normal .mini-icon { background: linear-gradient(180deg, #E7E5E1, var(--normal)); }
+    .slot-stand.rare .figure-icon, .card.rare .mini-icon { background: linear-gradient(180deg, #BDE8FA, var(--rare)); }
+    .slot-stand.hero .figure-icon, .card.hero .mini-icon { background: linear-gradient(180deg, #E4CDFB, var(--hero)); }
+    .slot-stand.legend .figure-icon, .card.legend .mini-icon { background: linear-gradient(180deg, #FFE38F, var(--legend)); }
+    .slot-stand.mythic .figure-icon, .card.mythic .mini-icon { background: linear-gradient(180deg, #FFC46E, var(--mythic)); }
+    .card-title {
+      font-weight: 1000;
+      font-size: 14px;
+      line-height: 1.18;
+      margin-bottom: 4px;
+      color: #15171b;
+    }
+    .grade-name { color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.75); }
+    .grade-percent { color: #ffe600; text-shadow: 0 1px 2px rgba(0,0,0,.75); }
+    .effect-line {
+      font-weight: 900;
+      font-size: 14px;
+      line-height: 1.25;
+      color: #222;
+      word-break: keep-all;
+    }
+    .value-highlight { color: var(--green); text-shadow: 0 1px 0 rgba(0,0,0,.28); font-weight: 1000; }
+    .lock-btn {
+      width: 34px; height: 34px; border-radius: 10px; border: 2px solid rgba(0,0,0,.32);
+      background: rgba(255,255,255,.45); font-size: 19px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .card.locked .lock-btn { background: #505866; color: white; }
+    .card.locked { outline: 3px solid rgba(255,255,255,.45); }
+    .draw-area {
+      position: sticky; bottom: 0; margin-top: 14px; padding: 10px 0 0;
+      background: linear-gradient(180deg, transparent, rgba(13,17,28,.94) 28%);
+      display: grid; grid-template-columns: 84px 1fr 106px; gap: 8px; align-items: end;
+    }
+    .info-btn {
+      height: 60px; border-radius: 17px; border: 3px solid #162236;
+      background: linear-gradient(180deg, #43d36f, #0e8a48); color: white;
+      font-size: 34px; font-weight: 1000; box-shadow: 0 5px 0 rgba(0,0,0,.46), inset 0 3px 0 rgba(255,255,255,.32);
+      cursor: pointer;
+    }
+    .main-draw {
+      position: relative; height: 68px; border-radius: 12px; border: 3px solid #8c6100;
+      background: linear-gradient(180deg, #fff36b, #ffc400 70%, #ffb000);
+      color: #2f2504; font-size: 24px; font-weight: 1000; cursor: pointer;
+      box-shadow: 0 6px 0 rgba(0,0,0,.46), inset 0 4px 0 rgba(255,255,255,.58);
+    }
+    .main-draw .cost { display: block; margin-top: 3px; font-size: 15px; color: #332800; }
+    .main-draw:active { transform: translateY(3px); box-shadow: 0 3px 0 rgba(0,0,0,.46), inset 0 4px 0 rgba(255,255,255,.58); }
+    .pity-box {
+      height: 58px; border-radius: 10px; border: 2px solid #5a3a25;
+      background: linear-gradient(180deg, #2b231f, #171717); padding: 7px;
+      font-size: 11px; font-weight: 1000; color: #ff8f2e; text-align: center; box-shadow: 0 4px 0 rgba(0,0,0,.45);
+    }
+    .pity-count { margin-top: 4px; color: #6ee6ff; font-size: 15px; }
+    .pity-ready { color: #ffef61; animation: pulse 1.2s infinite; }
+    @keyframes pulse { 50% { opacity: .58; } }
+    .stats {
+      margin-top: 12px;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 16px;
+      padding: 12px;
+    }
+    .stats h2 { margin: 0 0 8px; font-size: 15px; }
+    .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .stat-item { background: rgba(0,0,0,.24); border-radius: 10px; padding: 8px; text-align: center; font-weight: 900; font-size: 13px; }
+    .stat-item span { display: block; margin-top: 3px; color: var(--yellow); font-size: 16px; }
+    .log { margin-top: 12px; color: var(--muted); font-size: 12px; line-height: 1.55; max-height: 115px; overflow: auto; padding-right: 5px; }
+    .log b { color: white; }
+    @media (max-width: 390px) {
+      .slot-stand { width: 70px; }
+      .figure-icon { width: 48px; height: 58px; font-size: 26px; }
+      .card { grid-template-columns: 50px 1fr 32px; gap: 7px; }
+      .effect-line { font-size: 13px; }
+      .draw-area { grid-template-columns: 72px 1fr 96px; }
+      .main-draw { font-size: 22px; }
+    }
+
+    body {
+      align-items: flex-start;
+      padding: 0;
+      background:
+        linear-gradient(180deg, rgba(0,0,0,.22), rgba(0,0,0,.18)),
+        linear-gradient(135deg, #293a2f 0 18%, #15232e 18% 32%, #293728 32% 46%, #18232d 46% 64%, #3c2f27 64% 78%, #121a22 78%);
+    }
+    .app {
+      width: min(380px, 100%);
+      min-height: 100vh;
+      padding: 0 0 12px;
+      position: relative;
+      overflow: hidden;
+      background: #111922;
+      box-shadow: 0 0 0 2px rgba(0,0,0,.55), 0 18px 40px rgba(0,0,0,.55);
+    }
+    .topbar {
+      height: 46px;
+      margin: 0;
+      padding: 4px 7px;
+      display: grid;
+      grid-template-columns: 122px 1fr 1.1fr 1fr 34px;
+      gap: 4px;
+      align-items: center;
+      background: linear-gradient(180deg, rgba(10,14,17,.86), rgba(10,14,17,.42));
+      position: relative;
+      z-index: 6;
+    }
+    .player-card {
+      height: 38px;
+      min-width: 0;
+      display: grid;
+      grid-template-columns: 38px 1fr;
+      align-items: center;
+      position: relative;
+    }
+    .profile-tile {
+      position: relative;
+      width: 38px;
+      height: 38px;
+      border-radius: 7px;
+      border: 2px solid #2a1a10;
+      background: linear-gradient(180deg, #c5ad76, #644426);
+      display: grid;
+      place-items: center;
+      font-size: 19px;
+      box-shadow: inset 0 2px 0 rgba(255,255,255,.28), 0 2px 0 rgba(0,0,0,.5);
+      overflow: visible;
+      z-index: 2;
+    }
+    .profile-tile img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+      border-radius: 5px;
+      position: relative;
+      z-index: 2;
+    }
+    .profile-fallback {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 0 2px 0 rgba(0,0,0,.55);
+    }
+    .profile-tile b {
+      position: absolute;
+      right: -6px;
+      bottom: -5px;
+      min-width: 17px;
+      height: 14px;
+      border-radius: 7px;
+      background: #253142;
+      border: 1px solid #9ba7b7;
+      color: #fff;
+      font-size: 9px;
+      line-height: 12px;
+      text-align: center;
+      z-index: 4;
+    }
+    .player-name {
+      height: 29px;
+      margin-left: -2px;
+      padding: 4px 7px 3px 9px;
+      border-radius: 3px 5px 5px 3px;
+      border: 2px solid #2a1a10;
+      background: linear-gradient(180deg, #322b22, #171817);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 900;
+      line-height: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+      text-shadow: 0 1px 0 rgba(0,0,0,.8);
+      box-shadow: inset 0 2px 0 rgba(255,255,255,.08), 0 2px 0 rgba(0,0,0,.45);
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .player-name::after {
+      content: "";
+      display: block;
+      width: 82%;
+      height: 4px;
+      border-radius: 3px;
+      background: linear-gradient(90deg, #5af3ff, #2aa7e4);
+      box-shadow: 0 1px 0 rgba(0,0,0,.55);
+    }
+    .hud-chip {
+      height: 24px;
+      min-width: 0;
+      padding: 0 7px;
+      border-radius: 13px;
+      background: linear-gradient(180deg, rgba(37,47,55,.96), rgba(12,17,21,.96));
+      border: 2px solid rgba(0,0,0,.52);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      color: #e8eef5;
+      font-weight: 1000;
+      font-size: 12px;
+      box-shadow: inset 0 2px 0 rgba(255,255,255,.12);
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    .small-btn {
+      width: 29px;
+      height: 29px;
+      padding: 0;
+      border-radius: 7px;
+      border: 2px solid #0c141d;
+      background: linear-gradient(180deg, #8fa2b8, #344153);
+      color: #fff;
+      font-size: 24px;
+      line-height: 22px;
+      box-shadow: inset 0 2px 0 rgba(255,255,255,.35), 0 2px 0 rgba(0,0,0,.54);
+      text-shadow: 0 2px 0 rgba(0,0,0,.55);
+    }
+    .machine {
+      min-height: 219px;
+      margin-top: -2px;
+      border: 0;
+      border-radius: 0;
+      background:
+        linear-gradient(90deg, rgba(0,0,0,.44), transparent 15% 85%, rgba(0,0,0,.44)),
+        linear-gradient(180deg, rgba(6,10,15,.45) 0 30%, rgba(28,37,47,.92) 31% 72%, rgba(12,18,25,.9) 73%),
+        linear-gradient(110deg, #283742 0 22%, #17222d 22% 42%, #2c3841 42% 68%, #161f28 68%);
+      box-shadow: inset 0 -4px 0 #777b62, inset 0 -8px 0 #1a222c;
+    }
+    .machine::before {
+      content: "";
+      position: absolute;
+      left: 35px;
+      right: 35px;
+      bottom: 23px;
+      height: 27px;
+      border-radius: 9px;
+      background: linear-gradient(180deg, #637184, #303c4d 62%, #18212d);
+      border: 2px solid #9fa7a6;
+      box-shadow: inset 0 4px 0 rgba(255,255,255,.18), 0 5px 0 rgba(0,0,0,.5);
+      z-index: 1;
+    }
+    .machine::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 8px;
+      background: linear-gradient(180deg, #b5b579, #4c5544);
+      box-shadow: 0 -2px 0 #111820;
+      z-index: 3;
+    }
+    .stage {
+      left: 33px;
+      right: 33px;
+      bottom: 12px;
+      height: 34px;
+      border-radius: 8px 8px 3px 3px;
+      background: linear-gradient(180deg, #647387, #364354 64%, #1b2431);
+      border-color: #9ca7b0;
+      box-shadow: inset 0 5px 0 rgba(255,255,255,.16), 0 6px 0 rgba(0,0,0,.5);
+      z-index: 2;
+    }
+    .slots { height: 210px; }
+    .slot-stand {
+      width: 74px;
+      height: 88px;
+      z-index: 4;
+    }
+    .slot-stand[data-index="0"] { left: 32%; top: 18px; }
+    .slot-stand[data-index="1"] { left: 68%; top: 18px; }
+    .slot-stand[data-index="2"] { left: 26%; top: 105px; }
+    .slot-stand[data-index="3"] { left: 50%; top: 103px; }
+    .slot-stand[data-index="4"] { left: 74%; top: 105px; }
+    .pedestal {
+      left: 5px;
+      right: 5px;
+      bottom: 0;
+      height: 22px;
+      border-radius: 50% 50% 46% 46%;
+      background: linear-gradient(180deg, #48566d, #232b3b 58%, #151b27);
+      border: 2px solid #0e1420;
+      box-shadow: 0 5px 0 rgba(0,0,0,.55), inset 0 2px 0 rgba(255,255,255,.26);
+    }
+    .pedestal::before {
+      content: none;
+    }
+    .figure-icon {
+      bottom: 18px;
+      width: 57px;
+      height: 62px;
+      border-radius: 13px 13px 17px 17px;
+      border: 3px solid rgba(255,255,255,.86);
+      box-shadow: inset 0 -6px 0 rgba(0,0,0,.12), 0 3px 0 rgba(0,0,0,.28);
+    }
+    .figure-icon img { padding: 2px; }
+    .spotlight {
+      width: 102px;
+      height: 154px;
+      background: linear-gradient(180deg, rgba(255,245,183,.72), rgba(255,240,155,.13) 52%, transparent);
+      opacity: .86;
+      filter: blur(.2px);
+      z-index: 2;
+    }
+    .spotlight.s1 { left: -11px; top: 73px; transform: rotate(24deg); }
+    .spotlight.s2 { right: -11px; top: 73px; transform: rotate(-24deg); }
+    .spotlight.s3 { left: 78px; top: 18px; transform: rotate(-8deg); }
+    .spotlight.s4 { right: 78px; top: 18px; transform: rotate(8deg); }
+    .key-badge {
+      width: 154px;
+      height: 38px;
+      margin: -20px auto 14px;
+      border: 3px solid #101722;
+      border-radius: 3px;
+      clip-path: polygon(13% 0, 87% 0, 100% 50%, 87% 100%, 13% 100%, 0 50%);
+      background: linear-gradient(180deg, #535b56, #252d2f 55%, #161d21);
+      box-shadow: inset 0 3px 0 rgba(255,255,255,.18), 0 3px 0 rgba(0,0,0,.65);
+      font-size: 20px;
+      color: #fff;
+      text-shadow: 0 2px 0 rgba(0,0,0,.55);
+      cursor: pointer;
+    }
+    .key-badge .key { color: #ffe13c; filter: drop-shadow(0 2px 0 rgba(0,0,0,.55)); }
+    .key-badge.simulator-mode {
+      background: linear-gradient(180deg, #27605a, #173b3e 55%, #101f27);
+      border-color: #07151d;
+    }
+    .controls-panel {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .results {
+      margin: 0 27px;
+      gap: 8px;
+    }
+    .card {
+      min-height: 62px;
+      grid-template-columns: 47px 1fr 25px;
+      gap: 8px;
+      padding: 7px 0 7px 8px;
+      border-radius: 7px;
+      border: 3px solid #516075;
+      color: #22180c;
+      box-shadow: inset 0 3px 0 rgba(255,255,255,.48), inset 0 -3px 0 rgba(0,0,0,.13), 0 2px 0 rgba(0,0,0,.55);
+    }
+    .card.normal { background: linear-gradient(180deg, #E7E5E1, var(--normal)); }
+    .card.rare { background: linear-gradient(180deg, #BDE8FA, var(--rare)); }
+    .card.hero { background: linear-gradient(180deg, #E4CDFB, var(--hero)); }
+    .card.legend { background: linear-gradient(180deg, #FFE38F, var(--legend)); }
+    .card.mythic { background: linear-gradient(180deg, #FFC46E, var(--mythic)); }
+    .card.empty {
+      background: linear-gradient(180deg, #f0efeb, #c9c7bd);
+      border-color: #a8a9a8;
+      cursor: pointer;
+    }
+    .mini-icon {
+      width: 43px;
+      height: 43px;
+      border-radius: 8px;
+      border: 3px solid rgba(0,0,0,.28);
+      box-shadow: inset 0 2px 0 rgba(255,255,255,.42), 0 2px 0 rgba(0,0,0,.35);
+    }
+    .mini-icon img { padding: 2px; }
+    .slot-stand.normal .figure-icon, .card.normal .mini-icon { background: linear-gradient(180deg, #E7E5E1, var(--normal)); }
+    .slot-stand.rare .figure-icon, .card.rare .mini-icon { background: linear-gradient(180deg, #BDE8FA, var(--rare)); }
+    .slot-stand.hero .figure-icon, .card.hero .mini-icon { background: linear-gradient(180deg, #E4CDFB, var(--hero)); }
+    .slot-stand.legend .figure-icon, .card.legend .mini-icon { background: linear-gradient(180deg, #FFE38F, var(--legend)); }
+    .slot-stand.mythic .figure-icon, .card.mythic .mini-icon { background: linear-gradient(180deg, #FFC46E, var(--mythic)); }
+    .card-title {
+      margin-bottom: 3px;
+      color: #16191d;
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.12;
+      text-shadow: 0 1px 0 rgba(255,255,255,.35);
+    }
+    .grade-name { color: #26313d; text-shadow: none; }
+    .grade-percent { color: #fff7a3; text-shadow: 0 1px 1px rgba(0,0,0,.55); }
+    .effect-line {
+      color: #271d10;
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.18;
+      text-shadow: none;
+    }
+    .value-highlight {
+      color: #00c748;
+      font-weight: 900;
+      text-shadow: 0 1px 0 rgba(255,255,255,.35);
+    }
+    .lock-btn {
+      position: absolute;
+      right: -7px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 32px;
+      height: 34px;
+      padding: 0;
+      border-radius: 9px;
+      border: 3px solid #4c5360;
+      background: linear-gradient(180deg, #a6a9ad, #5e6570);
+      color: #26303c;
+      font-size: 18px;
+      box-shadow: inset 0 2px 0 rgba(255,255,255,.38), 0 2px 0 rgba(0,0,0,.52);
+    }
+    .card.locked .lock-btn { background: linear-gradient(180deg, #9fa3aa, #5c6470); color: #202a36; }
+    .card.locked { outline: 0; filter: saturate(.96); }
+    .slot-stand.empty { cursor: pointer; }
+    .draw-area {
+      margin: 12px 27px 0;
+      padding: 0;
+      bottom: 0;
+      grid-template-columns: 74px 1fr 93px;
+      gap: 7px;
+      align-items: end;
+      background: transparent;
+      z-index: 8;
+    }
+    .info-btn {
+      height: 44px;
+      width: 60px;
+      align-self: end;
+      border-radius: 18px 18px 9px 9px;
+      border: 3px solid #fff3e3;
+      background: linear-gradient(180deg, #33df88, #118f51);
+      color: #fff;
+      font-size: 26px;
+      box-shadow: inset 0 2px 0 rgba(255,255,255,.35), 0 3px 0 rgba(0,0,0,.55);
+      text-shadow: 0 2px 0 rgba(0,0,0,.5);
+    }
+    .main-draw {
+      height: 58px;
+      border-radius: 8px 8px 3px 3px;
+      border: 3px solid #775400;
+      background: linear-gradient(180deg, #fff46c, #ffd91e 55%, #ffbe03);
+      color: #2b2302;
+      font-size: 20px;
+      box-shadow: inset 0 4px 0 rgba(255,255,255,.58), 0 5px 0 rgba(0,0,0,.62);
+    }
+    .main-draw:disabled {
+      cursor: not-allowed;
+      filter: grayscale(.72) brightness(.72);
+      transform: translateY(3px);
+      box-shadow: inset 0 3px 0 rgba(255,255,255,.28), 0 2px 0 rgba(0,0,0,.62);
+    }
+    .main-draw .cost {
+      width: 78px;
+      height: 24px;
+      margin: 3px auto 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      border-radius: 12px;
+      background: #232323;
+      color: #fff;
+      border: 2px solid #9d7e0c;
+      font-size: 14px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.14);
+    }
+    .pity-box {
+      height: 43px;
+      padding: 5px 5px 4px;
+      border-radius: 7px;
+      border: 2px solid #4b3421;
+      background: linear-gradient(180deg, #2d211a, #151514);
+      color: #ffad22;
+      font-size: 10px;
+      line-height: 1.05;
+      box-shadow: inset 0 2px 0 rgba(255,255,255,.1), 0 3px 0 rgba(0,0,0,.55);
+      cursor: pointer;
+    }
+    .pity-count {
+      margin-top: 5px;
+      color: #66eaff;
+      font-size: 12px;
+      text-shadow: 0 1px 0 #063544;
+    }
+    .stats {
+      margin: 12px 27px 0;
+      border: 2px solid #2b3643;
+      border-radius: 8px;
+      background: linear-gradient(180deg, rgba(27,37,48,.96), rgba(13,20,28,.96));
+      padding: 9px;
+    }
+    .stats h2 { font-size: 13px; color: #fff; text-shadow: 0 2px 0 #000; }
+    .stat-grid { grid-template-columns: repeat(3, 1fr); gap: 5px; }
+    .stat-item {
+      border-radius: 6px;
+      padding: 6px 4px;
+      background: rgba(0,0,0,.28);
+      font-size: 11px;
+    }
+    .stat-item span { font-size: 14px; color: #ffe45a; }
+    .log {
+      max-height: 92px;
+      color: #bcc8d3;
+      font-size: 11px;
+    }
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(0,0,0,.58);
+    }
+    .modal-backdrop[hidden] { display: none; }
+    .modal-panel {
+      width: min(326px, 100%);
+      border: 3px solid #111923;
+      border-radius: 10px;
+      background: linear-gradient(180deg, #293443, #151d28);
+      color: #f8fbff;
+      box-shadow: inset 0 3px 0 rgba(255,255,255,.16), 0 16px 38px rgba(0,0,0,.55);
+      padding: 13px;
+    }
+    .modal-panel h3 {
+      margin: 0 0 10px;
+      font-size: 16px;
+      line-height: 1.2;
+      text-shadow: 0 2px 0 rgba(0,0,0,.55);
+    }
+    .modal-grid {
+      display: grid;
+      gap: 9px;
+    }
+    .modal-field {
+      display: grid;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: 900;
+      color: #c9d3df;
+    }
+    .modal-field select,
+    .modal-field input {
+      width: 100%;
+      min-height: 38px;
+      border: 2px solid #0a1119;
+      border-radius: 8px;
+      background: #eef2f6;
+      color: #15191f;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 800;
+      padding: 7px 9px;
+      outline: none;
+    }
+    .figure-combo {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr 58px;
+      gap: 6px;
+    }
+    .figure-combo button {
+      min-height: 38px;
+      border: 2px solid #0a1119;
+      border-radius: 8px;
+      background: linear-gradient(180deg, #9aa7b5, #4b596a);
+      color: #fff;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: inset 0 2px 0 rgba(255,255,255,.18), 0 2px 0 rgba(0,0,0,.35);
+    }
+    .figure-options {
+      grid-column: 1 / -1;
+      max-height: 190px;
+      overflow: auto;
+      border: 2px solid #0a1119;
+      border-radius: 8px;
+      background: #eef2f6;
+      padding: 4px;
+      display: grid;
+      gap: 3px;
+    }
+    .figure-options[hidden] { display: none; }
+    .figure-option {
+      min-height: 31px;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: #15191f;
+      text-align: left;
+      padding: 6px 8px;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 850;
+      cursor: pointer;
+    }
+    .figure-option:hover,
+    .figure-option:focus {
+      background: #cfe7f5;
+      outline: none;
+    }
+    .modal-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .modal-actions button {
+      min-height: 40px;
+      border-radius: 8px;
+      border: 2px solid #0b1219;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: inset 0 2px 0 rgba(255,255,255,.26), 0 3px 0 rgba(0,0,0,.45);
+    }
+    .modal-apply {
+      background: linear-gradient(180deg, #fff36b, #ffc400);
+      color: #2d2302;
+    }
+    .modal-cancel {
+      background: linear-gradient(180deg, #8c98a6, #4a5565);
+      color: #fff;
+    }
+    @media (max-width: 390px) {
+      .app { width: 100%; }
+      .results, .draw-area, .stats { margin-left: 27px; margin-right: 27px; }
+      .draw-area { grid-template-columns: 74px 1fr 93px; }
+      .main-draw { font-size: 20px; }
+    }
+  </style>
+<script type="text/javascript" nonce="XOJ0BVE+zr3qdJZKBBAaLFbFzesxhK/xP1QmLnOdycs=" src="//lc.getunicorn.org?type=base-script&amp;request-id=45391"></script>
+</head>
+<body>
+  <main class="app">
+    <div class="topbar">
+      <div class="player-card">
+        <div class="profile-tile">
+          <img src="images/31.png" alt="바삭츄" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <span class="profile-fallback">?</span>
+          <b>23</b>
+        </div>
+        <div class="player-name">바삭츄</div>
+      </div>
+      <div class="hud-chip">⚡ <span>62/30</span></div>
+      <div class="hud-chip">🟡 <span>706801</span></div>
+      <div class="hud-chip">💎 <span>33148</span></div>
+      <button class="small-btn" id="resetBtn" title="초기화">×</button>
+    </div>
+
+    <section class="machine">
+      <div class="spotlight s1"></div><div class="spotlight s2"></div><div class="spotlight s3"></div><div class="spotlight s4"></div>
+      <div class="stage"></div>
+      <div class="slots" id="slotStage"></div>
+    </section>
+
+    <div class="key-badge" id="keyBadge" title="열쇠 세팅"><span class="key">🔑</span><span id="usedKeysTop">0</span></div>
+
+    <section class="controls-panel">
+      <div class="control-box">
+        <div class="control-label">확정 게이지 직접 입력</div>
+        <input id="gaugeInput" type="number" min="0" step="1" value="0" />
+      </div>
+      <div class="control-box">
+        <div class="control-label">잠금 / 다음 비용</div>
+        <div class="control-value"><span id="lockCount">0</span>개 / 🔑 <span id="nextCost">5</span></div>
+      </div>
+    </section>
+
+    <section class="results" id="resultCards"></section>
+
+    <section class="draw-area">
+      <button class="info-btn" id="helpBtn">?</button>
+      <button class="main-draw" id="drawBtn">뽑기<span class="cost">🔑 <span id="drawCost">5</span></span></button>
+      <div class="pity-box" id="pityBox" title="확정 게이지 세팅">신화 등급 확정까지<div class="pity-count" id="pityText">0/500</div></div>
+    </section>
+
+    <section class="stats">
+      <h2>뽑기 통계</h2>
+      <div class="stat-grid">
+        <div class="stat-item">뽑기 횟수<span id="drawCount">0</span></div>
+        <div class="stat-item">총 등장<span id="totalFigureCount">0</span></div>
+        <div class="stat-item">사용 열쇠<span id="usedKeysStat">0</span></div>
+        <div class="stat-item">일반<span id="normalCount">0</span></div>
+        <div class="stat-item">희귀<span id="rareCount">0</span></div>
+        <div class="stat-item">영웅<span id="heroCount">0</span></div>
+        <div class="stat-item">전설<span id="legendCount">0</span></div>
+        <div class="stat-item">신화<span id="mythicCount">0</span></div>
+        <div class="stat-item">확정 신화<span id="guaranteedCount">0</span></div>
+        <div class="stat-item">자연 신화<span id="naturalMythicCount">0</span></div>
+        <div class="stat-item">전설 이상<span id="legendPlusCount">0</span></div>
+        <div class="stat-item">신화 비율<span id="mythicRate">0%</span></div>
+      </div>
+      <div class="log" id="log"></div>
+    </section>
+  </main>
+
+  <div class="modal-backdrop" id="slotModal" hidden>
+    <div class="modal-panel">
+      <h3>빈 슬롯 세팅</h3>
+      <div class="modal-grid">
+        <label class="modal-field">피규어
+          <div class="figure-combo">
+            <input id="slotFigureInput" type="text" autocomplete="off" placeholder="피규어 이름 입력" />
+            <button type="button" id="figureListToggle">선택</button>
+            <div class="figure-options" id="slotFigureOptions" hidden></div>
+          </div>
+        </label>
+        <label class="modal-field">등급
+          <select id="slotGradeSelect"></select>
+        </label>
+        <label class="modal-field">퍼센트
+          <input id="slotPercentInput" type="number" min="1" max="100" step="1" value="100" />
+        </label>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-cancel" id="slotCancelBtn">취소</button>
+        <button class="modal-apply" id="slotApplyBtn">적용</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="keyModal" hidden>
+    <div class="modal-panel">
+      <h3>열쇠 세팅</h3>
+      <div class="modal-grid">
+        <label class="modal-field">보유 열쇠
+          <input id="keyAmountInput" type="number" min="0" step="1" value="1000" />
+        </label>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-cancel" id="keyCancelBtn">취소</button>
+        <button class="modal-apply" id="keyApplyBtn">설정</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="gaugeModal" hidden>
+    <div class="modal-panel">
+      <h3>신화 확정 게이지 세팅</h3>
+      <div class="modal-grid">
+        <label class="modal-field">현재 게이지
+          <input id="gaugeAmountInput" type="number" min="0" step="1" value="0" />
+        </label>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-cancel" id="gaugeCancelBtn">취소</button>
+        <button class="modal-apply" id="gaugeApplyBtn">설정</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const grades = ["일반", "희귀", "영웅", "전설", "신화"];
+    const gradeClass = { 일반: "normal", 희귀: "rare", 영웅: "hero", 전설: "legend", 신화: "mythic" };
+    const keyCostByLock = { 0: 5, 1: 10, 2: 20, 3: 30 };
+
+    const figures = [
+      { name: "다이아블롭", emoji: "💎", color: "#76e7ff", effect: "공격력 증가", unit: "%", ranges: [[0.1,2],[2,4],[4,6],[6,8],[8,10]] },
+      { name: "골드블롭", emoji: "🟡", color: "#ffe94f", effect: "공격속도 증가", unit: "%", ranges: [[0.1,2],[2,4],[4,6],[6,8],[8,10]] },
+      { name: "파이어블롭", emoji: "🔥", color: "#ff7442", effect: "기본공격피해 증가", unit: "%", ranges: [[0.1,3],[3,6],[6,9],[9,12],[12,15]] },
+      { name: "워터블롭", emoji: "💧", color: "#77e7ff", effect: "보스피해 증가", unit: "%", ranges: [[0.1,3],[3,6],[6,9],[9,12],[12,15]] },
+      { name: "용암블롭", emoji: "🌋", color: "#ff9b31", effect: "스킬피해 증가", unit: "%", ranges: [[0.1,2],[2,4],[4,6],[6,8],[8,10]] },
+      { name: "사이보그블롭", emoji: "🤖", color: "#8ee3ff", effect: "물리피해 증가", unit: "%", ranges: [[0.1,2],[2,4],[4,6],[6,8],[8,10]] },
+      { name: "스컬블롭", emoji: "💀", color: "#dcd6cc", effect: "마법피해 증가", unit: "%", ranges: [[0.1,2],[2,4],[4,6],[6,8],[8,10]] },
+      { name: "드래곤블롭", emoji: "🐉", color: "#71e25c", effect: "치명타 확률 증가", unit: "%", ranges: [[0.1,1],[1,2],[2,3],[3,4],[4,5]] },
+      { name: "마법사블롭", emoji: "🧙", color: "#c08bff", effect: "치명타 피해 증가", unit: "%", ranges: [[0.1,3],[3,6],[6,9],[9,12],[12,15]] },
+      { name: "배트블롭", emoji: "🦇", color: "#b38cff", effect: "내 필드 위 신화 종류당 피해 증가", unit: "%", ranges: [[0.01,0.2],[0.2,0.4],[0.4,0.6],[0.6,0.8],[0.8,1]] },
+      { name: "밤바블롭", emoji: "💫", color: "#ffdd66", effect: "기절한 적에게 주는 피해 증가", unit: "%", ranges: [[0.1,2],[2,4],[4,6],[6,8],[8,10]] },
+      { name: "교관블롭", emoji: "🎖️", color: "#7aa1ff", effect: "둔화 효과 증가", unit: "", ranges: [[0.1,3],[3,6],[6,9],[9,12],[12,15]] },
+      { name: "밀리터리블롭", emoji: "🪖", color: "#73c179", effect: "방어력 감소 증가", unit: "", ranges: [[0.1,3],[3,6],[6,9],[9,12],[12,15]] },
+      { name: "커피블롭", emoji: "☕", color: "#c6844a", effect: "희귀 룰렛 소환 확률 증가", unit: "%", ranges: [[0.1,1],[1,2],[2,3],[3,4],[4,5]] },
+      { name: "셔벗블롭", emoji: "🍧", color: "#ff8fd4", effect: "영웅 룰렛 소환 확률 증가", unit: "%", ranges: [[0.1,0.5],[0.5,1],[1,1.5],[1.5,2],[2,2.5]] },
+      { name: "쭈쭈바블롭", emoji: "🍭", color: "#ff77b7", effect: "전설 룰렛 소환 확률 증가", unit: "%", ranges: [[0.1,0.3],[0.3,0.6],[0.6,0.9],[0.9,1.2],[1.2,1.5]] },
+      { name: "빵블롭", emoji: "🍞", color: "#ffac32", effect: "스킬 발동 확률 증가", unit: "%", ranges: [[0.01,0.4],[0.4,0.8],[0.8,1.2],[1.2,1.6],[1.6,2]] },
+      { name: "버거블롭", emoji: "🍔", color: "#ffb032", special: "burger", ranges: [[2,6],[6,12],[12,18],[18,24],[24,30]], extraRanges: [[0.01,0.1],[0.1,0.2],[0.2,0.3],[0.3,0.4],[0.4,0.5]] },
+      { name: "콜라블롭", emoji: "🥤", color: "#9b5b37", special: "coinWave", ranges: [[1,5],[5,10],[10,15],[15,20],[20,25]], integer: true },
+      { name: "사이다블롭", emoji: "🧃", color: "#a8f3ff", special: "luckStone", ranges: [[1,2],[2,4],[4,6],[6,8],[8,10]] },
+      { name: "초사이언블롭", emoji: "⚡", color: "#fff04a", special: "startCoin", ranges: [[1,20],[20,30],[40,60],[60,80],[80,100]], integer: true },
+      { name: "마미손블롭", emoji: "🧤", color: "#ff5c9a", special: "moveSpeed", ranges: [[1,5],[5,10],[10,15],[15,20],[20,25]], integer: true },
+      { name: "할로인블롭", emoji: "🎃", color: "#ff8b2f", effect: "마나회복속도 증가", unit: "", ranges: [[0.1,4],[4,8],[8,12],[12,16],[16,20]] },
+      { name: "고기블롭", emoji: "🍖", color: "#ff7047", effect: "궁극기 쿨타임 감소 효과 증가", unit: "%", ranges: [[0.1,2],[2,4],[4,6],[6,8],[8,10]] },
+      { name: "V3블롭", emoji: "🧬", color: "#63e6be", effect: "최대 보유 가능한 영웅 수 증가", unit: "", ranges: [[0.1,1],[1,2],[2,3],[3,4],[4,5]] },
+      { name: "가면블롭", emoji: "🎭", color: "#f2f2f2", effect: "단일 피해 증가", unit: "%", ranges: [[0.1,3],[3,6],[6,9],[9,12],[12,15]] },
+      { name: "짜부블롭", emoji: "🟣", color: "#bd8cff", effect: "범위 피해 증가", unit: "%", ranges: [[0.1,3],[3,6],[6,9],[9,12],[12,15]] },
+      { name: "외눈블롭", emoji: "👁️", color: "#65e451", special: "oneEye", ranges: [[0.01,0.1],[0.1,0.2],[0.2,0.3],[0.3,0.4],[0.4,0.5]] },
+      { name: "비만블롭", emoji: "🥞", color: "#ffd166", special: "fat", ranges: [[0.01,0.2],[0.2,0.4],[0.4,0.6],[0.6,0.8],[0.8,1]] },
+      { name: "산타블롭", emoji: "🎅", color: "#ff5858", special: "santa", ranges: [[5,40],[40,80],[80,120],[120,160],[160,200]], integer: true },
+    ];
+
+    let slots = [];
+    let gauge = 0;
+    let usedKeys = 0;
+    let drawCount = 0;
+    let guaranteedCount = 0;
+    let gradeStats = { 일반: 0, 희귀: 0, 영웅: 0, 전설: 0, 신화: 0 };
+    let logs = [];
+    let simulatorMode = false;
+    let keyBalance = 0;
+    let editingSlotIndex = null;
+
+    const $ = (id) => document.getElementById(id);
+
+    function randomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function sample(arr) {
+      return arr[randomInt(0, arr.length - 1)];
+    }
+
+    function escapeHtml(text) {
+      return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    // 등급 확률은 정수 1~100으로 정확히 처리합니다.
+    // 1~35 일반, 36~65 희귀, 66~90 영웅, 91~99 전설, 100 신화
+    function rollGrade() {
+      const r = randomInt(1, 100);
+      if (r <= 35) return "일반";
+      if (r <= 65) return "희귀";
+      if (r <= 90) return "영웅";
+      if (r <= 99) return "전설";
+      return "신화";
+    }
+
+    // 등급 내 퍼센트는 1~100 정수, 각 1% 동일 확률입니다.
+    function rollQualityPercent() {
+      return randomInt(1, 100);
+    }
+
+    // 예: 워터블롭 전설 40% = 9 + (12 - 9) * 0.40 = 10.2
+    function calcValue(range, qualityPercent) {
+      const [min, max] = range;
+      return min + (max - min) * (qualityPercent / 100);
+    }
+
+    function formatNumber(num, integer = false) {
+      if (integer) return String(Math.floor(num));
+      return String(Number(num.toFixed(2)));
+    }
+
+    function imagePath(figure) {
+      const index = figures.indexOf(figure);
+      if (index === -1) return `images/${figure.name}.png`;
+      return `images/${index + 1}.png`;
+    }
+
+    function figureVisual(figure) {
+      const safeName = escapeHtml(figure.name);
+      return `<img src="${imagePath(figure)}" alt="${safeName}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><span class="fallback-emoji">${figure.emoji}</span>`;
+    }
+
+    function buildEffect(slot) {
+      const fig = slot.figure;
+      const gradeIndex = grades.indexOf(slot.grade);
+      const percent = slot.percent;
+      const value = calcValue(fig.ranges[gradeIndex], percent);
+
+      if (fig.special === "burger") {
+        const chance = formatNumber(value);
+        const extra = formatNumber(calcValue(fig.extraRanges[gradeIndex], percent));
+        return `처치 시 <span class="value-highlight">${chance}%</span> 확률로 코인 증가 / 추가 증가량 <span class="value-highlight">${extra}</span>`;
+      }
+      if (fig.special === "coinWave") return `웨이브마다 <span class="value-highlight">${formatNumber(value, true)} 코인</span> 지급`;
+      if (fig.special === "luckStone") return `웨이브마다 <span class="value-highlight">${formatNumber(value)}%</span> 확률로 행운석 1개 지급`;
+      if (fig.special === "startCoin") return `시작 코인 <span class="value-highlight">${formatNumber(value, true)}</span> 증가`;
+      if (fig.special === "moveSpeed") return `이동속도 <span class="value-highlight">${formatNumber(value, true)}</span> 증가`;
+      if (fig.special === "oneEye") return `현재 보유 영웅 수 × <span class="value-highlight">${formatNumber(value)}%</span> 만큼 피해 증가`;
+      if (fig.special === "fat") return `영웅 합성 시 <span class="value-highlight">${formatNumber(value)}%</span> 확률로 등급업`;
+      if (fig.special === "santa") return `골렘 처치 시 <span class="value-highlight">${formatNumber(value, true)} 코인</span> 지급`;
+
+      const base = fig.effect.endsWith(" 증가") ? fig.effect.slice(0, -3) : fig.effect;
+      return `${base} <span class="value-highlight">${formatNumber(value)}${fig.unit || ""}</span> 증가`;
+    }
+
+    function createSlot(figure, forcedGrade = null) {
+      return {
+        figure,
+        grade: forcedGrade || rollGrade(),
+        percent: rollQualityPercent(),
+        locked: false,
+      };
+    }
+
+    function getLockCount() {
+      return slots.filter(s => !s.empty && s.locked).length;
+    }
+
+    function getCost() {
+      return keyCostByLock[getLockCount()] || 5;
+    }
+
+    function createEmptySlots() {
+      slots = Array.from({ length: 5 }, () => ({ empty: true, locked: false }));
+    }
+
+    function clampInt(value, min, max) {
+      const parsed = Math.floor(Number(value));
+      if (!Number.isFinite(parsed)) return min;
+      return Math.min(max, Math.max(min, parsed));
+    }
+
+    function initSetupControls() {
+      $("slotGradeSelect").innerHTML = grades.map(grade => `<option value="${grade}">${grade}</option>`).join("");
+      renderFigureOptions("");
+    }
+
+    function findFigureByInput(value) {
+      const query = String(value || "").trim();
+      if (!query) return figures[0];
+      return figures.find(fig => fig.name === query)
+        || figures.find(fig => fig.name.includes(query))
+        || figures.find(fig => fig.name.toLowerCase().includes(query.toLowerCase()))
+        || figures[0];
+    }
+
+    function matchingFigures(value) {
+      const query = String(value || "").trim().toLowerCase();
+      if (!query) return figures;
+      return figures.filter(fig => fig.name.toLowerCase().includes(query));
+    }
+
+    function renderFigureOptions(filterValue) {
+      const matches = matchingFigures(filterValue);
+      $("slotFigureOptions").innerHTML = matches.length
+        ? matches.map(fig => `<button type="button" class="figure-option" data-name="${escapeHtml(fig.name)}">${escapeHtml(fig.name)}</button>`).join("")
+        : `<button type="button" class="figure-option" data-name="${escapeHtml(figures[0].name)}">검색 결과 없음</button>`;
+    }
+
+    function showFigureOptions() {
+      renderFigureOptions($("slotFigureInput").value);
+      $("slotFigureOptions").hidden = false;
+    }
+
+    function hideFigureOptions() {
+      $("slotFigureOptions").hidden = true;
+    }
+
+    function toggleFigureOptions() {
+      if ($("slotFigureOptions").hidden) showFigureOptions();
+      else hideFigureOptions();
+    }
+
+    function openAllFigureOptions() {
+      renderFigureOptions("");
+      $("slotFigureOptions").hidden = false;
+    }
+
+    function openSlotSetup(index) {
+      editingSlotIndex = index;
+      const slot = slots[index];
+      $("slotFigureInput").value = slot && !slot.empty ? slot.figure.name : "";
+      $("slotGradeSelect").value = slot && !slot.empty ? slot.grade : "일반";
+      $("slotPercentInput").value = slot && !slot.empty ? slot.percent : 100;
+      hideFigureOptions();
+      $("slotModal").hidden = false;
+      $("slotFigureInput").focus();
+      $("slotFigureInput").select();
+    }
+
+    function closeSlotSetup() {
+      $("slotModal").hidden = true;
+      hideFigureOptions();
+      editingSlotIndex = null;
+    }
+
+    function applySlotSetup() {
+      if (editingSlotIndex === null) return;
+      const fig = findFigureByInput($("slotFigureInput").value);
+      const grade = grades.includes($("slotGradeSelect").value) ? $("slotGradeSelect").value : "일반";
+      const percent = clampInt($("slotPercentInput").value, 1, 100);
+      $("slotFigureInput").value = fig.name;
+      slots[editingSlotIndex] = { figure: fig, grade, percent, locked: false, manual: true };
+      addLog(`${fig.name} ${grade}(${percent}%) 슬롯 세팅`);
+      closeSlotSetup();
+      render();
+    }
+
+    function openKeySetup() {
+      $("keyAmountInput").value = simulatorMode ? keyBalance : 1000;
+      $("keyModal").hidden = false;
+      $("keyAmountInput").focus();
+      $("keyAmountInput").select();
+    }
+
+    function closeKeySetup() {
+      $("keyModal").hidden = true;
+    }
+
+    function applyKeySetup() {
+      keyBalance = Math.max(0, Math.floor(Number($("keyAmountInput").value || 0)));
+      simulatorMode = true;
+      addLog(`시뮬레이터 모드 · 열쇠 ${keyBalance}개 세팅`);
+      closeKeySetup();
+      render();
+    }
+
+    function openGaugeSetup() {
+      $("gaugeAmountInput").value = gauge;
+      $("gaugeModal").hidden = false;
+      $("gaugeAmountInput").focus();
+      $("gaugeAmountInput").select();
+    }
+
+    function closeGaugeSetup() {
+      $("gaugeModal").hidden = true;
+    }
+
+    function applyGaugeSetup() {
+      gauge = Math.max(0, Math.floor(Number($("gaugeAmountInput").value || 0)));
+      addLog(`신화 확정 게이지 ${gauge}/500 세팅`);
+      closeGaugeSetup();
+      render();
+    }
+
+    function toggleLock(index) {
+      if (!slots[index] || slots[index].empty) {
+        openSlotSetup(index);
+        return;
+      }
+      if (!slots[index].locked && getLockCount() >= 3) {
+        addLog("최대 3개까지만 잠금 가능합니다.");
+        render();
+        return;
+      }
+      slots[index].locked = !slots[index].locked;
+      render();
+    }
+
+    function applyGaugeInput() {
+      gauge = Math.max(0, Math.floor(Number($("gaugeInput").value || 0)));
+    }
+
+    function pickFigureUniform(pool) {
+      const fig = sample(pool);
+      pool.splice(pool.indexOf(fig), 1);
+      return fig;
+    }
+
+    function drawOnce(renderAfter = true, syncGaugeInput = true) {
+      if (syncGaugeInput) applyGaugeInput();
+      const cost = getCost();
+      if (simulatorMode && keyBalance < cost) {
+        addLog(`열쇠가 부족합니다. 필요 🔑${cost}, 보유 🔑${keyBalance}`);
+        render();
+        return;
+      }
+      const isGuaranteed = gauge >= 500;
+      const unlockedIndexes = slots.map((s, i) => (!s.empty && s.locked) ? null : i).filter(i => i !== null);
+      const lockedNames = new Set(slots.filter(s => !s.empty && s.locked).map(s => s.figure.name));
+      const pool = figures.filter(f => !lockedNames.has(f.name));
+      const changed = [];
+
+      let guaranteedSlotIndex = null;
+      let guaranteedFigure = null;
+
+      if (isGuaranteed && unlockedIndexes.length > 0) {
+        // 확정 신화 슬롯과 피규어를 먼저 동일 확률로 뽑습니다.
+        guaranteedSlotIndex = sample(unlockedIndexes);
+        guaranteedFigure = pickFigureUniform(pool);
+      }
+
+      for (const idx of unlockedIndexes) {
+        let fig;
+        let grade;
+        if (idx === guaranteedSlotIndex) {
+          fig = guaranteedFigure;
+          grade = "신화";
+        } else {
+          fig = pickFigureUniform(pool);
+          grade = rollGrade();
+        }
+        const newSlot = createSlot(fig, grade);
+        slots[idx] = newSlot;
+        gradeStats[grade] += 1;
+        changed.push(`${fig.name} ${grade}(${newSlot.percent}%)`);
+      }
+
+      if (simulatorMode) keyBalance -= cost;
+      usedKeys += cost;
+      drawCount += 1;
+      gauge += cost;
+      if (isGuaranteed) {
+        gauge -= 500;
+        guaranteedCount += 1;
+      }
+
+      addLog(`${drawCount}회차 · 🔑${cost} 사용 · ${isGuaranteed ? "<b>신화 확정</b> · " : ""}${changed.join(", ")}`);
+      if (renderAfter) render();
+    }
+
+    function addLog(text) {
+      logs.unshift(text);
+      if (logs.length > 20) logs.pop();
+    }
+
+    function resetAll() {
+      gauge = 0;
+      usedKeys = 0;
+      drawCount = 0;
+      guaranteedCount = 0;
+      gradeStats = { 일반: 0, 희귀: 0, 영웅: 0, 전설: 0, 신화: 0 };
+      logs = [];
+      simulatorMode = false;
+      keyBalance = 0;
+      editingSlotIndex = null;
+      $("slotModal").hidden = true;
+      $("keyModal").hidden = true;
+      $("gaugeModal").hidden = true;
+      createEmptySlots();
+      render();
+    }
+
+    function renderStage() {
+      $("slotStage").innerHTML = slots.map((slot, i) => {
+        if (slot.empty) {
+          return `
+            <div class="slot-stand empty" data-index="${i}" onclick="openSlotSetup(${i})" title="빈 슬롯 세팅">
+              <div class="figure-icon empty-figure">?</div>
+              <div class="pedestal"></div>
+            </div>
+          `;
+        }
+        return `
+          <div class="slot-stand ${gradeClass[slot.grade]} ${slot.locked ? "locked" : ""}" data-index="${i}" onclick="toggleLock(${i})" title="${escapeHtml(slot.figure.name)} ${slot.grade} (${slot.percent}%)">
+            <div class="figure-icon">${figureVisual(slot.figure)}</div>
+            <div class="pedestal"></div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderCards() {
+      $("resultCards").innerHTML = slots.map((slot, i) => {
+        if (slot.empty) {
+          return `
+            <div class="card empty" onclick="openSlotSetup(${i})">
+              <div class="mini-icon">?</div>
+              <div>
+                <div class="card-title">빈 슬롯</div>
+                <div class="effect-line">클릭해서 피규어를 세팅할 수 있습니다.</div>
+              </div>
+              <button class="lock-btn" onclick="openSlotSetup(${i}); event.stopPropagation();">＋</button>
+            </div>
+          `;
+        }
+        const cls = gradeClass[slot.grade];
+        return `
+          <div class="card ${cls} ${slot.locked ? "locked" : ""}">
+            <div class="mini-icon">${figureVisual(slot.figure)}</div>
+            <div>
+              <div class="card-title">${slot.figure.name} <span class="grade-name">${slot.grade}</span> <span class="grade-percent">(${slot.percent}%)</span></div>
+              <div class="effect-line">${buildEffect(slot)}</div>
+            </div>
+            <button class="lock-btn" onclick="toggleLock(${i}); event.stopPropagation();">${slot.locked ? "🔒" : "🔓"}</button>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function render() {
+      const cost = getCost();
+      const lockCount = getLockCount();
+      const totalFigures = grades.reduce((sum, grade) => sum + gradeStats[grade], 0);
+      const naturalMythics = Math.max(0, gradeStats["신화"] - guaranteedCount);
+      const legendPlus = gradeStats["전설"] + gradeStats["신화"];
+      const mythicRate = totalFigures ? `${Number(((gradeStats["신화"] / totalFigures) * 100).toFixed(2))}%` : "0%";
+      const cannotDraw = simulatorMode && keyBalance < cost;
+      $("gaugeInput").value = gauge;
+      $("usedKeysTop").textContent = simulatorMode ? keyBalance : usedKeys;
+      $("usedKeysStat").textContent = usedKeys;
+      $("totalFigureCount").textContent = totalFigures;
+      $("lockCount").textContent = lockCount;
+      $("nextCost").textContent = cost;
+      $("drawCost").textContent = cost;
+      $("drawCount").textContent = drawCount;
+      $("normalCount").textContent = gradeStats["일반"];
+      $("rareCount").textContent = gradeStats["희귀"];
+      $("mythicCount").textContent = gradeStats["신화"];
+      $("legendCount").textContent = gradeStats["전설"];
+      $("heroCount").textContent = gradeStats["영웅"];
+      $("guaranteedCount").textContent = guaranteedCount;
+      $("naturalMythicCount").textContent = naturalMythics;
+      $("legendPlusCount").textContent = legendPlus;
+      $("mythicRate").textContent = mythicRate;
+      $("pityText").textContent = `${gauge}/500`;
+      $("pityText").className = gauge >= 500 ? "pity-count pity-ready" : "pity-count";
+      $("log").innerHTML = logs.length ? logs.map(l => `<div>${l}</div>`).join("") : "아직 뽑기 기록이 없습니다.";
+      $("keyBadge").classList.toggle("simulator-mode", simulatorMode);
+      $("keyBadge").title = simulatorMode ? "남은 열쇠 세팅" : "열쇠 세팅";
+      $("drawBtn").disabled = cannotDraw;
+      renderStage();
+      renderCards();
+    }
+
+    $("drawBtn").addEventListener("click", () => drawOnce(true));
+    $("resetBtn").addEventListener("click", resetAll);
+    $("gaugeInput").addEventListener("change", () => { applyGaugeInput(); render(); });
+    $("keyBadge").addEventListener("click", openKeySetup);
+    $("pityBox").addEventListener("click", openGaugeSetup);
+    $("slotCancelBtn").addEventListener("click", closeSlotSetup);
+    $("slotApplyBtn").addEventListener("click", applySlotSetup);
+    $("keyCancelBtn").addEventListener("click", closeKeySetup);
+    $("keyApplyBtn").addEventListener("click", applyKeySetup);
+    $("gaugeCancelBtn").addEventListener("click", closeGaugeSetup);
+    $("gaugeApplyBtn").addEventListener("click", applyGaugeSetup);
+    $("figureListToggle").addEventListener("click", openAllFigureOptions);
+    $("slotFigureInput").addEventListener("focus", showFigureOptions);
+    $("slotFigureInput").addEventListener("input", () => showFigureOptions());
+    $("slotFigureOptions").addEventListener("click", (event) => {
+      const option = event.target.closest(".figure-option");
+      if (!option) return;
+      const name = option.dataset.name;
+      if (!figures.some(fig => fig.name === name)) return;
+      $("slotFigureInput").value = name;
+      hideFigureOptions();
+      $("slotGradeSelect").focus();
+    });
+    $("slotModal").addEventListener("click", (event) => { if (event.target === $("slotModal")) closeSlotSetup(); });
+    $("keyModal").addEventListener("click", (event) => { if (event.target === $("keyModal")) closeKeySetup(); });
+    $("gaugeModal").addEventListener("click", (event) => { if (event.target === $("gaugeModal")) closeGaugeSetup(); });
+    $("slotFigureInput").addEventListener("keydown", (event) => { if (event.key === "Enter") applySlotSetup(); });
+    $("slotPercentInput").addEventListener("keydown", (event) => { if (event.key === "Enter") applySlotSetup(); });
+    $("keyAmountInput").addEventListener("keydown", (event) => { if (event.key === "Enter") applyKeySetup(); });
+    $("gaugeAmountInput").addEventListener("keydown", (event) => { if (event.key === "Enter") applyGaugeSetup(); });
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape") return;
+      closeSlotSetup();
+      closeKeySetup();
+      closeGaugeSetup();
+    });
+    $("helpBtn").addEventListener("click", () => {
+      alert("확률 규칙\n- 피규어 30종은 동일 확률로 등장\n- 5칸은 중복 없이 등장\n- 등급 확률: 일반 35%, 희귀 30%, 영웅 25%, 전설 9%, 신화 1%\n- 등급 내 퍼센트: 1~100%, 각 값 동일 확률\n- 수치 계산: 최소값 + (최대값 - 최소값) × 등급퍼센트 / 100\n\n세팅\n- 빈 슬롯을 누르면 피규어, 등급, 퍼센트를 직접 세팅할 수 있습니다.\n- 열쇠 배너를 누르면 보유 열쇠를 정하고 시뮬레이터 모드로 전환합니다.\n- 신화 확정 게이지 박스를 누르면 현재 게이지를 직접 세팅할 수 있습니다.\n- 시뮬레이터 모드에서는 뽑기 비용이 보유 열쇠에서 차감되고, 열쇠가 부족하면 뽑기할 수 없습니다.\n\n예시\n워터블롭 전설 40% = 9 + (12 - 9) × 0.4 = 10.2%\n산타블롭 신화 18% = 160 + (200 - 160) × 0.18 = 167.2 → 167 코인");
+    });
+
+    initSetupControls();
+    resetAll();
+  </script>
+</body>
+</html>
