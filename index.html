@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>블롭 피규어 시뮬레이터</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="topbar" aria-label="재화와 확정 게이지">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <div>
+            <h1>블롭 피규어</h1>
+            <p>황금 열쇠 뽑기 시뮬레이터</p>
+          </div>
+        </div>
+
+        <div class="resource-board">
+          <div class="resource">
+            <span class="key-icon" aria-hidden="true"></span>
+            <span id="keyCount">0</span>
+          </div>
+          <div class="guarantee">
+            <div class="guarantee-copy">
+              <span id="guaranteeLabel">신화 확정까지</span>
+              <strong id="pityCount">0/500</strong>
+            </div>
+            <div class="gauge-track" aria-hidden="true">
+              <span id="pityBar"></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="play-area">
+        <aside class="side-panel left-panel" aria-label="뽑기 상태">
+          <div class="panel-section compact">
+            <span class="panel-label">잠금</span>
+            <strong id="lockCount">0/3</strong>
+          </div>
+          <div class="panel-section compact">
+            <span class="panel-label">소모</span>
+            <strong><span id="costValue">5</span> 열쇠</strong>
+          </div>
+          <div class="panel-section">
+            <span class="panel-label">확률</span>
+            <div id="oddsList" class="odds-list"></div>
+          </div>
+        </aside>
+
+        <section class="machine" aria-label="피규어 뽑기 머신">
+          <div class="spotlight spotlight-a" aria-hidden="true"></div>
+          <div class="spotlight spotlight-b" aria-hidden="true"></div>
+          <div class="cabinet">
+            <div class="slot-row top-row" id="topSlots"></div>
+            <div class="slot-row bottom-row" id="bottomSlots"></div>
+          </div>
+          <div class="control-strip">
+            <button class="icon-button" id="unlockAllBtn" type="button" aria-label="전체 잠금 해제">
+              <span aria-hidden="true">↺</span>
+            </button>
+            <button class="pull-button" id="pullBtn" type="button">
+              <span class="pull-title">뽑기</span>
+              <span class="pull-cost"><span class="key-icon small" aria-hidden="true"></span><span id="pullCost">5</span></span>
+            </button>
+            <button class="icon-button" id="resetBtn" type="button" aria-label="초기화">
+              <span aria-hidden="true">⟲</span>
+            </button>
+          </div>
+        </section>
+
+        <aside class="side-panel right-panel" aria-label="최근 기록">
+          <div class="panel-section">
+            <span class="panel-label">최근 뽑기</span>
+            <div id="historyList" class="history-list"></div>
+          </div>
+          <div class="panel-actions">
+            <button class="chip-button" id="addKeysBtn" type="button">+500</button>
+            <button class="chip-button" id="fillGaugeBtn" type="button">게이지 +500</button>
+          </div>
+        </aside>
+      </section>
+
+      <section class="result-panel" aria-label="현재 피규어">
+        <div id="resultList" class="result-list"></div>
+      </section>
+
+      <p id="statusText" class="status-text" role="status" aria-live="polite"></p>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
