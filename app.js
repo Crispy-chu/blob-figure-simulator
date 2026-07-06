@@ -8,6 +8,8 @@ const RARITIES = [
 
 const COST_BY_LOCKS = [5, 10, 20, 30];
 const RARITY_KEYS = RARITIES.map((rarity) => rarity.key);
+const PRESET_STORAGE_KEY = "blobFigureSimulator.presets.v1";
+const MAX_PRESETS = 12;
 
 const rangeA = ranges([0.1, 2], [2, 4], [4, 6], [6, 8], [8, 10]);
 const rangeB = ranges([0.1, 3], [3, 6], [6, 9], [9, 12], [12, 15]);
@@ -82,6 +84,10 @@ const dom = {
   resetBtn: document.querySelector("#resetBtn"),
   addKeysBtn: document.querySelector("#addKeysBtn"),
   fillGaugeBtn: document.querySelector("#fillGaugeBtn"),
+  presetCount: document.querySelector("#presetCount"),
+  presetNameInput: document.querySelector("#presetNameInput"),
+  savePresetBtn: document.querySelector("#savePresetBtn"),
+  presetList: document.querySelector("#presetList"),
   statusText: document.querySelector("#statusText"),
 };
 
@@ -90,6 +96,7 @@ const state = {
   pity: 419,
   slots: [],
   history: [],
+  presets: [],
   rolling: false,
 };
 
@@ -97,6 +104,7 @@ init();
 
 function init() {
   state.slots = createInitialSlots();
+  state.presets = loadPresets();
   renderOdds();
   bindEvents();
   render();
@@ -117,6 +125,8 @@ function bindEvents() {
     setStatus("확정 게이지 500 증가");
     render();
   });
+  dom.savePresetBtn.addEventListener("click", saveCurrentPreset);
+  dom.presetList.addEventListener("click", handlePresetAction);
 }
 
 function createInitialSlots() {
@@ -144,9 +154,12 @@ function render() {
   dom.resetBtn.disabled = state.rolling;
   dom.addKeysBtn.disabled = state.rolling;
   dom.fillGaugeBtn.disabled = state.rolling;
+  dom.savePresetBtn.disabled = state.rolling;
+  dom.presetNameInput.disabled = state.rolling;
   renderSlots();
   renderResults();
   renderHistory();
+  renderPresets();
 }
 
 function renderSlots() {
@@ -195,6 +208,40 @@ function renderHistory() {
         </div>
       `,
     )
+    .join("");
+}
+
+function renderPresets() {
+  const countText = `${state.presets.length}개 저장됨`;
+  dom.presetCount.textContent = countText;
+
+  if (state.presets.length === 0) {
+    dom.presetList.innerHTML = `<div class="preset-empty">저장된 프리셋 없음</div>`;
+    return;
+  }
+
+  dom.presetList.innerHTML = state.presets
+    .map((preset) => {
+      const preview = preset.slots
+        .slice(0, 5)
+        .map((slot) => {
+          const figure = getFigure(slot.figureId);
+          const rarity = getRarity(slot.rarityKey);
+          return `${slot.locked ? "■" : "□"} ${figure?.symbol ?? "?"}${rarity?.name.slice(0, 1) ?? "?"}`;
+        })
+        .join(" ");
+
+      return `
+        <div class="preset-item">
+          <button class="preset-load" type="button" data-preset-action="load" data-preset-id="${preset.id}">
+            <span class="preset-name">${escapeHtml(preset.name)}</span>
+            <span class="preset-preview">${preview}</span>
+            <span class="preset-meta">열쇠 ${formatNumber(preset.keys)} · 게이지 ${preset.pity}/500</span>
+          </button>
+          <button class="preset-delete" type="button" data-preset-action="delete" data-preset-id="${preset.id}" aria-label="${escapeHtml(preset.name)} 삭제">×</button>
+        </div>
+      `;
+    })
     .join("");
 }
 
@@ -320,6 +367,81 @@ function resetSimulation() {
   render();
 }
 
+function saveCurrentPreset() {
+  if (state.rolling) return;
+
+  const typedName = dom.presetNameInput.value.trim();
+  const name = typedName || `프리셋 ${state.presets.length + 1}`;
+  const existingIndex = state.presets.findIndex((preset) => preset.name === name);
+  const preset = {
+    id: existingIndex >= 0 ? state.presets[existingIndex].id : `preset-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    name,
+    keys: state.keys,
+    pity: state.pity,
+    savedAt: Date.now(),
+    slots: state.slots.map(serializeSlot),
+  };
+
+  if (existingIndex >= 0) {
+    state.presets.splice(existingIndex, 1, preset);
+  } else {
+    state.presets.unshift(preset);
+  }
+
+  state.presets = state.presets
+    .sort((left, right) => right.savedAt - left.savedAt)
+    .slice(0, MAX_PRESETS);
+  persistPresets();
+  dom.presetNameInput.value = "";
+  setStatus(`${name} 저장 완료`);
+  render();
+}
+
+function handlePresetAction(event) {
+  const button = event.target.closest("[data-preset-action]");
+  if (!button || state.rolling) return;
+
+  const presetId = button.dataset.presetId;
+  const action = button.dataset.presetAction;
+  if (action === "load") {
+    loadPreset(presetId);
+  }
+  if (action === "delete") {
+    deletePreset(presetId);
+  }
+}
+
+function loadPreset(presetId) {
+  const preset = state.presets.find((item) => item.id === presetId);
+  if (!preset) return;
+
+  const restoredSlots = preset.slots.map(deserializeSlot);
+  if (restoredSlots.some((slot) => !slot) || new Set(restoredSlots.map((slot) => slot.result.figure.id)).size !== restoredSlots.length) {
+    setStatus("프리셋을 불러올 수 없음");
+    return;
+  }
+
+  state.keys = Number.isFinite(preset.keys) ? preset.keys : state.keys;
+  state.pity = Number.isFinite(preset.pity) ? preset.pity : state.pity;
+  state.slots = restoredSlots;
+  state.history.unshift({
+    label: "프리셋",
+    cost: 0,
+    summary: `${preset.name} 불러오기`,
+  });
+  state.history = state.history.slice(0, 12);
+  setStatus(`${preset.name} 불러오기 완료`);
+  render();
+}
+
+function deletePreset(presetId) {
+  const preset = state.presets.find((item) => item.id === presetId);
+  state.presets = state.presets.filter((item) => item.id !== presetId);
+  persistPresets();
+  setStatus(`${preset?.name ?? "프리셋"} 삭제 완료`);
+  render();
+}
+
 function getLockedCount() {
   return state.slots.filter((slot) => slot.locked).length;
 }
@@ -331,6 +453,10 @@ function getPullCost() {
 function createResult(pickedFigure, forcedRarityKey = null) {
   const rarityKey = forcedRarityKey ?? rollRarity();
   const quality = randomInt(1, 100);
+  return createResultFromParts(pickedFigure, rarityKey, quality);
+}
+
+function createResultFromParts(pickedFigure, rarityKey, quality) {
   const values = pickedFigure.stats.map((entry) => valueFromRange(entry.ranges[rarityKey], quality, entry.integer));
   return {
     figure: pickedFigure,
@@ -339,6 +465,53 @@ function createResult(pickedFigure, forcedRarityKey = null) {
     values,
     effectText: formatEffect(pickedFigure, values),
   };
+}
+
+function serializeSlot(slot) {
+  return {
+    figureId: slot.result.figure.id,
+    rarityKey: slot.result.rarityKey,
+    quality: slot.result.quality,
+    locked: slot.locked,
+  };
+}
+
+function deserializeSlot(slot, index) {
+  const figure = getFigure(slot.figureId);
+  const rarity = getRarity(slot.rarityKey);
+  const quality = Number(slot.quality);
+  if (!figure || !rarity || !Number.isFinite(quality)) return null;
+
+  return {
+    id: `slot-${index}-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    index,
+    locked: Boolean(slot.locked),
+    result: createResultFromParts(figure, rarity.key, Math.min(100, Math.max(1, Math.round(quality)))),
+  };
+}
+
+function loadPresets() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(PRESET_STORAGE_KEY) ?? "[]");
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(isValidPreset).slice(0, MAX_PRESETS);
+  } catch {
+    return [];
+  }
+}
+
+function persistPresets() {
+  localStorage.setItem(PRESET_STORAGE_KEY, JSON.stringify(state.presets));
+}
+
+function isValidPreset(preset) {
+  return (
+    preset &&
+    typeof preset.id === "string" &&
+    typeof preset.name === "string" &&
+    Array.isArray(preset.slots) &&
+    preset.slots.length === 5
+  );
 }
 
 function formatEffect(pickedFigure, values) {
@@ -397,6 +570,10 @@ function getRarity(key) {
   return RARITIES.find((rarity) => rarity.key === key);
 }
 
+function getFigure(id) {
+  return FIGURES.find((figureItem) => figureItem.id === id);
+}
+
 function valueFromRange([min, max], quality, integer = false) {
   const value = min + (max - min) * (quality / 100);
   return integer ? Math.round(value) : value;
@@ -451,4 +628,14 @@ function getNthSlotEnd(markup, count) {
 
 function setStatus(message) {
   dom.statusText.textContent = message;
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  })[char]);
 }

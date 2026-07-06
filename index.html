@@ -87,6 +87,20 @@
         <div id="resultList" class="result-list"></div>
       </section>
 
+      <section class="preset-panel" aria-label="프리셋">
+        <div class="preset-toolbar">
+          <div>
+            <span class="panel-label">프리셋</span>
+            <strong id="presetCount">0개 저장됨</strong>
+          </div>
+          <div class="preset-save">
+            <input id="presetNameInput" type="text" maxlength="18" placeholder="이름" aria-label="프리셋 이름" />
+            <button class="chip-button" id="savePresetBtn" type="button">저장</button>
+          </div>
+        </div>
+        <div id="presetList" class="preset-list"></div>
+      </section>
+
       <p id="statusText" class="status-text" role="status" aria-live="polite"></p>
     </main>
 
