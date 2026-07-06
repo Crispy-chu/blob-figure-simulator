@@ -80,6 +80,14 @@
       text-shadow: 0 1px 0 rgba(255,255,255,.45);
       white-space: nowrap;
     }
+    .preset-open-btn {
+      top: 42px;
+      min-height: 24px;
+      padding: 0 7px;
+      background: linear-gradient(180deg, #8fe9ff, #2a9fc0);
+      color: #062536;
+      font-size: 10px;
+    }
     .tier-open-btn:active {
       transform: translateY(2px);
       box-shadow: inset 0 2px 0 rgba(255,255,255,.5), 0 1px 0 rgba(0,0,0,.45);
@@ -1266,6 +1274,26 @@
     .tier-detail-section b {
       color: #00813a;
     }
+    .preset-state {
+      min-height: 42px;
+      padding: 9px;
+      border-radius: 8px;
+      background: rgba(0,0,0,.28);
+      color: #d8e2ee;
+      font-size: 12px;
+      font-weight: 850;
+      line-height: 1.35;
+    }
+    .preset-state b {
+      color: #ffe45a;
+    }
+    .modal-actions.three {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+    .modal-delete {
+      background: linear-gradient(180deg, #ff8b8b, #c33737);
+      color: #fff;
+    }
     .modal-grid {
       display: grid;
       gap: 9px;
@@ -1491,6 +1519,7 @@
 
     <section class="machine">
       <button class="tier-open-btn" id="tierBtn" type="button">🏆 피규어 티어표</button>
+      <button class="tier-open-btn preset-open-btn" id="presetBtn" type="button">💾 프리셋</button>
       <div class="spotlight s1"></div><div class="spotlight s2"></div><div class="spotlight s3"></div><div class="spotlight s4"></div>
       <div class="stage"></div>
       <div class="slots" id="slotStage"></div>
@@ -1597,6 +1626,21 @@
     </div>
   </div>
 
+  <div class="modal-backdrop" id="presetModal" hidden>
+    <div class="modal-panel">
+      <h3>프리셋 저장 / 불러오기</h3>
+      <div class="preset-state" id="presetState">저장된 프리셋 없음</div>
+      <div class="modal-actions three">
+        <button class="modal-cancel" id="presetCloseBtn">닫기</button>
+        <button class="modal-delete" id="presetDeleteBtn">삭제</button>
+        <button class="modal-apply" id="presetSaveBtn">저장</button>
+      </div>
+      <div class="modal-actions single">
+        <button class="modal-apply" id="presetLoadBtn">불러오기</button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-backdrop" id="mythicConfirmModal" hidden>
     <div class="modal-panel">
       <div class="confirm-copy">
@@ -1690,6 +1734,7 @@
     const expectationKeyCap = 80000;
     const expectationBatchSize = 1;
     const expectationMaxMs = 6500;
+    const presetStorageKey = "blobFigureSimulatorPresetV1";
 
     const figures = [
       { name: "다이아블롭", emoji: "💎", color: "#76e7ff", effect: "공격력 증가", unit: "%", ranges: [[0.1,2],[2,4],[4,6],[6,8],[8,10]] },
@@ -1938,6 +1983,150 @@
 
     function closeTierDetailModal() {
       $("tierDetailModal").hidden = true;
+    }
+
+    function serializeSlot(slot) {
+      if (!slot || slot.empty) return { empty: true, locked: false };
+      return {
+        empty: false,
+        figureName: slot.figure.name,
+        grade: slot.grade,
+        percent: slot.percent,
+        locked: !!slot.locked,
+        manual: !!slot.manual,
+        expectationCurrent: !!slot.expectationCurrent,
+      };
+    }
+
+    function restoreSlot(savedSlot) {
+      if (!savedSlot || savedSlot.empty) return { empty: true, locked: false };
+      return {
+        figure: figureByName(savedSlot.figureName),
+        grade: grades.includes(savedSlot.grade) ? savedSlot.grade : "신화",
+        percent: clampInt(savedSlot.percent || 100, 1, 100),
+        locked: !!savedSlot.locked,
+        manual: !!savedSlot.manual,
+        expectationCurrent: !!savedSlot.expectationCurrent,
+      };
+    }
+
+    function serializeTarget(target) {
+      if (!target || target.empty) return null;
+      return {
+        options: normalizeTargetOptions(target).map(option => ({
+          figureName: option.figure.name,
+          grade: option.grade,
+          percent: option.percent,
+        })),
+      };
+    }
+
+    function restoreTarget(savedTarget) {
+      if (!savedTarget || !Array.isArray(savedTarget.options) || !savedTarget.options.length) return null;
+      const options = savedTarget.options.slice(0, 5).map(option => makeTargetOption(
+        figureByName(option.figureName),
+        grades.includes(option.grade) ? option.grade : "신화",
+        clampInt(option.percent || 1, 1, 100)
+      ));
+      const primary = options[0];
+      return {
+        figure: primary.figure,
+        grade: primary.grade,
+        gradeIndex: primary.gradeIndex,
+        percent: primary.percent,
+        options,
+        empty: false,
+      };
+    }
+
+    function readPreset() {
+      try {
+        const raw = localStorage.getItem(presetStorageKey);
+        return raw ? JSON.parse(raw) : null;
+      } catch {
+        return null;
+      }
+    }
+
+    function formatPresetTime(value) {
+      if (!value) return "-";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return "-";
+      return date.toLocaleString("ko-KR", { dateStyle: "short", timeStyle: "short" });
+    }
+
+    function updatePresetState() {
+      const preset = readPreset();
+      if (!preset) {
+        $("presetState").innerHTML = "저장된 프리셋 없음";
+        $("presetLoadBtn").disabled = true;
+        $("presetDeleteBtn").disabled = true;
+        return;
+      }
+      const savedSlots = Array.isArray(preset.slots) ? preset.slots.filter(slot => slot && !slot.empty).length : 0;
+      const savedTargets = Array.isArray(preset.targetSlots) ? preset.targetSlots.filter(Boolean).length : 0;
+      $("presetState").innerHTML = `저장됨: <b>${formatPresetTime(preset.savedAt)}</b><br>피규어 ${savedSlots}칸 · 목표 ${savedTargets}칸 · 게이지 ${preset.gauge || 0}/500`;
+      $("presetLoadBtn").disabled = false;
+      $("presetDeleteBtn").disabled = false;
+    }
+
+    function openPresetModal() {
+      updatePresetState();
+      $("presetModal").hidden = false;
+    }
+
+    function closePresetModal() {
+      $("presetModal").hidden = true;
+    }
+
+    function savePreset() {
+      const preset = {
+        savedAt: new Date().toISOString(),
+        version: 1,
+        expectationMode,
+        simulatorMode,
+        keyBalance,
+        gauge,
+        slots: slots.map(serializeSlot),
+        targetSlots: targetSlots.map(serializeTarget),
+      };
+      localStorage.setItem(presetStorageKey, JSON.stringify(preset));
+      addLog("프리셋 저장 완료");
+      updatePresetState();
+      render();
+    }
+
+    function loadPreset() {
+      const preset = readPreset();
+      if (!preset) {
+        updatePresetState();
+        return;
+      }
+      expectationMode = !!preset.expectationMode;
+      simulatorMode = !!preset.simulatorMode;
+      keyBalance = Math.max(0, Math.floor(Number(preset.keyBalance || 0)));
+      gauge = Math.max(0, Math.floor(Number(preset.gauge || 0)));
+      slots = Array.from({ length: 5 }, (_, index) => restoreSlot(preset.slots?.[index]));
+      targetSlots = Array.from({ length: 5 }, (_, index) => restoreTarget(preset.targetSlots?.[index]));
+      expectationResultHtml = "";
+      expectationAnimating = false;
+      expectationPreviewSlots = [];
+      drawAnimating = false;
+      drawGlowIndexes = [];
+      if (drawGlowTimer) {
+        clearTimeout(drawGlowTimer);
+        drawGlowTimer = null;
+      }
+      addLog("프리셋 불러오기 완료");
+      closePresetModal();
+      render();
+    }
+
+    function deletePreset() {
+      localStorage.removeItem(presetStorageKey);
+      addLog("프리셋 삭제 완료");
+      updatePresetState();
+      render();
     }
 
     function buildEffect(slot) {
@@ -2413,6 +2602,7 @@
       $("slotModal").hidden = true;
       $("keyModal").hidden = true;
       $("gaugeModal").hidden = true;
+      $("presetModal").hidden = true;
       $("expectResultModal").hidden = true;
       $("expectModal").hidden = true;
       $("mythicConfirmModal").hidden = true;
@@ -3254,6 +3444,11 @@
     $("tierBtn").addEventListener("click", openTierModal);
     $("tierCloseBtn").addEventListener("click", closeTierModal);
     $("tierDetailCloseBtn").addEventListener("click", closeTierDetailModal);
+    $("presetBtn").addEventListener("click", openPresetModal);
+    $("presetCloseBtn").addEventListener("click", closePresetModal);
+    $("presetSaveBtn").addEventListener("click", savePreset);
+    $("presetLoadBtn").addEventListener("click", loadPreset);
+    $("presetDeleteBtn").addEventListener("click", deletePreset);
     $("resetBtn").addEventListener("click", resetAll);
     $("gaugeInput").addEventListener("change", () => { applyGaugeInput(); render(); });
     $("keyBadge").addEventListener("click", openKeySetup);
@@ -3288,6 +3483,7 @@
     $("slotModal").addEventListener("click", (event) => { if (event.target === $("slotModal")) closeSlotSetup(); });
     $("keyModal").addEventListener("click", (event) => { if (event.target === $("keyModal")) closeKeySetup(); });
     $("gaugeModal").addEventListener("click", (event) => { if (event.target === $("gaugeModal")) closeGaugeSetup(); });
+    $("presetModal").addEventListener("click", (event) => { if (event.target === $("presetModal")) closePresetModal(); });
     $("tierModal").addEventListener("click", (event) => {
       if (event.target === $("tierModal")) {
         closeTierModal();
@@ -3347,10 +3543,11 @@
     $("mythicConfirmModal").addEventListener("click", (event) => { if (event.target === $("mythicConfirmModal")) closeMythicConfirm(); });
     document.addEventListener("keydown", (event) => {
       if (event.key !== "Escape") return;
-      const hadOpenModal = !$("slotModal").hidden || !$("keyModal").hidden || !$("gaugeModal").hidden || !$("expectModal").hidden || !$("expectResultModal").hidden || !$("mythicConfirmModal").hidden || !$("tierModal").hidden || !$("tierDetailModal").hidden;
+      const hadOpenModal = !$("slotModal").hidden || !$("keyModal").hidden || !$("gaugeModal").hidden || !$("presetModal").hidden || !$("expectModal").hidden || !$("expectResultModal").hidden || !$("mythicConfirmModal").hidden || !$("tierModal").hidden || !$("tierDetailModal").hidden;
       closeSlotSetup();
       closeKeySetup();
       closeGaugeSetup();
+      closePresetModal();
       closeExpectationResultModal();
       closeMythicConfirm();
       closeTierModal();
